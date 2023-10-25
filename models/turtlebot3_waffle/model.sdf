@@ -137,7 +137,7 @@
         <ray>
           <scan>
             <horizontal>
-              <samples>2187</samples>
+              <samples>100</samples>
               <resolution>1.000000</resolution>
               <min_angle>-1.57</min_angle>
               <max_angle>1.57</max_angle>
@@ -166,7 +166,7 @@
           </ros>
           <!-- <output_type>sensor_msgs/LaserScan</output_type> -->
           <!-- <frame_name>base_scan</frame_name> -->
-          <!-- <topicName>/velodyne_points</topicName> -->
+          <topicName>/velodyne_points</topicName>
           <frameName>/velodyne</frameName>
           <min_range>0.9</min_range>
           <max_range>130</max_range>
