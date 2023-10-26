@@ -97,7 +97,8 @@
     
     <link name="base_scan">    
       <inertial>
-        <pose>-0.052 0 0.111 0 0 0</pose>
+        <!-- <pose>-0.052 0 0.111 0 0 0</pose> -->
+        <pose>0.012 0 0.121 0 0 0</pose>
         <inertia>
           <ixx>0.001</ixx>
           <ixy>0.000</ixy>
@@ -110,7 +111,8 @@
       </inertial>
 
       <collision name="lidar_sensor_collision">
-        <pose>-0.052 0 0.111 0 0 0</pose>
+        <!-- <pose>-0.052 0 0.111 0 0 0</pose> -->
+        <pose>0.012 0 0.121 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.0508</radius>
@@ -120,7 +122,8 @@
       </collision>
 
       <visual name="lidar_sensor_visual">
-        <pose>-0.064 0 0.121 0 0 0</pose>
+        <!-- <pose>-0.064 0 0.121 0 0 0</pose> -->
+        <pose>0 0 0.121 0 0 0</pose>
         <geometry>
           <mesh>
             <uri>model://turtlebot3_common/meshes/lds.dae</uri>
@@ -131,19 +134,20 @@
 
       <sensor name="velodyne-VLP32E" type="gpu_ray">
         <always_on>true</always_on>
-        <visualize>true</visualize>
-        <pose>-0.064 0 0.121 0 0 0</pose>
+        <visualize>false</visualize>
+        <!-- <pose>-0.064 0 0.121 0 0 0</pose> -->
+        <pose>0 0 0.121 0 0 0</pose>
         <update_rate>10</update_rate>
         <ray>
           <scan>
             <horizontal>
-              <samples>100</samples>
+              <samples>1000</samples>
               <resolution>1.000000</resolution>
               <min_angle>-1.57</min_angle>
               <max_angle>1.57</max_angle>
             </horizontal>
             <vertical>
-                <samples>32</samples>
+                <samples>128</samples>
                 <resolution>1</resolution>
                 <min_angle>-0.535</min_angle>
                 <max_angle>0.186</max_angle>
@@ -160,12 +164,11 @@
             <stddev>0.01</stddev>
           </noise>
         </ray>
-        <plugin name="gazebo_ros_laser_controller" filename="libgazebo_ros_velodyne_laser.so">
+        <plugin name="laser_controller" filename="libgazebo_ros_ray_sensor.so">
           <ros>
-            <remapping>~/out:=velodyne_points</remapping>
+            <argument>~/out:=points2</argument>
           </ros>
-          <!-- <output_type>sensor_msgs/LaserScan</output_type> -->
-          <!-- <frame_name>base_scan</frame_name> -->
+          <output_type>sensor_msgs/PointCloud2</output_type>
           <topicName>/velodyne_points</topicName>
           <frameName>/velodyne</frameName>
           <min_range>0.9</min_range>
@@ -460,7 +463,8 @@
     <joint name="lidar_joint" type="fixed">
       <parent>base_link</parent>
       <child>base_scan</child>
-      <pose>-0.064 0 0.121 0 0 0</pose>
+      <!-- <pose>-0.064 0 0.121 0 0 0</pose> -->
+        <pose>0 0 0.121 0 0 0</pose>
       <axis>
         <xyz>0 0 1</xyz>
       </axis>
