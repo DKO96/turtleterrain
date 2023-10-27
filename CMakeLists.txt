@@ -20,11 +20,13 @@ endif()
 # Find ament packages and libraries for ament and system dependencies
 ################################################################################
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 find_package(gazebo REQUIRED)
 find_package(gazebo_ros_pkgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclpy REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 
@@ -69,13 +71,23 @@ install(TARGETS ${EXEC_NAME}
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(DIRECTORY launch models rviz urdf worlds
+install(DIRECTORY launch models rviz urdf worlds 
   DESTINATION share/${PROJECT_NAME}/
 )
 
 install(DIRECTORY include/
   DESTINATION include/
 )
+
+# Install python modules
+ament_python_install_package(${PROJECT_NAME})
+
+# Install Python executables
+install(PROGRAMS
+  scripts/pcd_subscriber_node.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 
 ################################################################################
 # Macro for ament package
