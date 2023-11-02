@@ -85,6 +85,7 @@ ament_python_install_package(${PROJECT_NAME})
 # Install Python executables
 install(PROGRAMS
   scripts/pcd_subscriber_node.py
+  scripts/pc_visualizer_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

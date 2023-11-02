@@ -5,20 +5,19 @@ import os
 import rclpy 
 from rclpy.node import Node
 import sensor_msgs.msg as sensor_msgs
-
+from std_msgs.msg import Float64MultiArray, MultiArrayDimension
 
 import numpy as np
-import open3d as o3d
 
 class PCDListener(Node):
 
     def __init__(self):
-        super().__init__('pcd_subsriber_node')
+        super().__init__('pcd_subscriber_node')
 
         ## This is for visualization of the received point cloud.
-        self.vis = o3d.visualization.Visualizer()
-        self.vis.create_window()
-        self.o3d_pcd = o3d.geometry.PointCloud()
+        # self.vis = o3d.visualization.Visualizer()
+        # self.vis.create_window()
+        # self.o3d_pcd = o3d.geometry.PointCloud()
 
 
         # Set up a subscription to the 'pcd' topic with a callback to the 
@@ -30,7 +29,12 @@ class PCDListener(Node):
             10                          # QoS
         )
 
-                
+        self.pcd_publisher = self.create_publisher(
+            Float64MultiArray,
+            'xyz_pointcloud',
+            10
+        )
+
     def listener_callback(self, msg):
         # Here we convert the 'msg', which is of the type PointCloud2.
         # I ported the function read_points2 from 
@@ -38,17 +42,28 @@ class PCDListener(Node):
         # https://github.com/ros/common_msgs/blob/noetic-devel/sensor_msgs/src/sensor_msgs/point_cloud2.py
 
         pcd_as_numpy_array = np.array(list(read_points(msg)))
-        
+
+        num_points = pcd_as_numpy_array.shape[0]
+        num_coords = pcd_as_numpy_array.shape[1]
+
+        formatted_msg = Float64MultiArray()
+
+        dim1 = MultiArrayDimension(label='points', size=num_points, stride=num_points*num_coords)
+        dim2 = MultiArrayDimension(label='coordinates', size=num_coords, stride=num_coords)
+        formatted_msg.layout.dim = [dim1, dim2]
+        formatted_msg.layout.data_offset = 0
+
+        formatted_msg.data = pcd_as_numpy_array.flatten().tolist()
+
+        self.pcd_publisher.publish(formatted_msg)
 
         # The rest here is for visualization.
-        self.vis.remove_geometry(self.o3d_pcd)
-        self.o3d_pcd = o3d.geometry.PointCloud(
-                            o3d.utility.Vector3dVector(pcd_as_numpy_array))
-        self.vis.add_geometry(self.o3d_pcd)
-        self.vis.poll_events()
-        self.vis.update_renderer()
-
-        
+        # self.vis.remove_geometry(self.o3d_pcd)
+        # self.o3d_pcd = o3d.geometry.PointCloud(
+        #                     o3d.utility.Vector3dVector(pcd_as_numpy_array))
+        # self.vis.add_geometry(self.o3d_pcd)
+        # self.vis.poll_events()
+        # self.vis.update_renderer()
 
 
 ## The code below is "ported" from 
