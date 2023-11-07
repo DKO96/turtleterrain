@@ -26,16 +26,22 @@ class O3DNode(Node):
     def o3d_visualizer(self, msg):
         points_dim = msg.layout.dim[0].size
         coords_dim = msg.layout.dim[1].size
-        xyz_array = np.array(msg.data).reshape((points_dim, coords_dim))
+        pc_array = np.array(msg.data).reshape((points_dim, coords_dim))
 
-        # self.get_logger().info(f'xyz format shape: {xyz_array}')
+        np.savetxt('pc_snapshot.xyz', pc_array)
+        self.get_logger().info(f'xyz format shape: {pc_array}')
 
-        self.vis.remove_geometry(self.o3d_pcd)
-        self.o3d_pcd = o3d.geometry.PointCloud(
-                            o3d.utility.Vector3dVector(xyz_array))
-        self.vis.add_geometry(self.o3d_pcd)
-        self.vis.poll_events()
-        self.vis.update_renderer()
+        self.get_logger().info('shutting down node')
+        self.subscription.destroy()
+        rclpy.shutdown()
+
+
+        # self.vis.remove_geometry(self.o3d_pcd)
+        # self.o3d_pcd = o3d.geometry.PointCloud(
+        #                     o3d.utility.Vector3dVector(xyz_array))
+        # self.vis.add_geometry(self.o3d_pcd)
+        # self.vis.poll_events()
+        # self.vis.update_renderer()
 
 
 def main(args=None):
