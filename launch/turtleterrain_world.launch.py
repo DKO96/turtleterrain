@@ -69,7 +69,7 @@ def generate_launch_description():
             'y_pose': y_pose
         }.items()
     )
-   
+
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -84,7 +84,7 @@ def generate_launch_description():
     ld.add_action(gzclient_cmd)
     ld.add_action(robot_state_publisher_cmd)
     ld.add_action(spawn_turtlebot_cmd)
-    ld.add_action(rviz_node)
+    # ld.add_action(rviz_node)
 
 
     return ld
