@@ -71,7 +71,7 @@ install(TARGETS ${EXEC_NAME}
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(DIRECTORY launch models rviz urdf worlds 
+install(DIRECTORY launch models rviz urdf worlds map param 
   DESTINATION share/${PROJECT_NAME}/
 )
 
@@ -86,6 +86,7 @@ ament_python_install_package(${PROJECT_NAME})
 install(PROGRAMS
   scripts/pcd_subscriber_node.py
   scripts/pc_visualizer_node.py
+  scripts/scan_subscriber_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
