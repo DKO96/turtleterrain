@@ -86,7 +86,7 @@ ament_python_install_package(${PROJECT_NAME})
 install(PROGRAMS
   scripts/pcd_subscriber_node.py
   scripts/pc_visualizer_node.py
-  scripts/scan_subscriber_node.py
+  scripts/path_follower_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
