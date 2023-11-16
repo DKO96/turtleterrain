@@ -24,7 +24,7 @@ class PCDListener(Node):
         # function `listener_callback`
         self.pcd_subscriber = self.create_subscription(
             sensor_msgs.PointCloud2,    # Msg type
-            'points2',                      # topic
+            'cloud_in',                      # topic
             self.listener_callback,      # Function to call
             10                          # QoS
         )

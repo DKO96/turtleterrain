@@ -30,7 +30,6 @@ class O3DNode(Node):
 
         np.savetxt('pc_snapshot.xyz', pc_array)
         self.get_logger().info(f'xyz format shape: {pc_array}')
-
         self.get_logger().info('shutting down node')
         self.subscription.destroy()
         rclpy.shutdown()
@@ -38,7 +37,7 @@ class O3DNode(Node):
 
         # self.vis.remove_geometry(self.o3d_pcd)
         # self.o3d_pcd = o3d.geometry.PointCloud(
-        #                     o3d.utility.Vector3dVector(xyz_array))
+        #                     o3d.utility.Vector3dVector(pc_array))
         # self.vis.add_geometry(self.o3d_pcd)
         # self.vis.poll_events()
         # self.vis.update_renderer()

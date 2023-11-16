@@ -87,6 +87,9 @@ install(PROGRAMS
   scripts/pcd_subscriber_node.py
   scripts/pc_visualizer_node.py
   scripts/path_follower_node.py
+  scripts/planar_patch_detection_node.py
+  scripts/target_pose_pub.py
+  scripts/test_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
