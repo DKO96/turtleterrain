@@ -29,7 +29,8 @@ def generate_launch_description():
         get_package_share_directory('turtleterrain'),
         'models',
         model_folder,
-        'model.sdf'
+        # 'model.sdf'
+        'lidar_model.sdf'
     )
 
     # Launch configuration variables specific to simulation
