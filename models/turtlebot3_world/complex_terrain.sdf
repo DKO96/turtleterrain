@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="complex_terrain_flat">
+    <pose>0 0 0 0 0 0</pose>
+    <static>true</static>
+    <link name="body">
+      <visual name="visual">
+        <geometry>
+          <mesh><uri>model://turtlebot3_world/meshes/complex_terrain_flat.dae</uri></mesh>
+        </geometry>
+        <material>
+           <script>
+             <uri>model://turtlebot3_world/media/scripts</uri>
+             <uri>model://turtlebot3_world/media/Textures</uri>
+             <name>RepeatedGrass/Diffuse</name>
+           </script>
+         </material> 
+      </visual>
+
+      <collision name="collision">
+        <geometry>
+          <mesh><uri>model://turtlebot3_world/meshes/complex_terrain.dae</uri></mesh>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

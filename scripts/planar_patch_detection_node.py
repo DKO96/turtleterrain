@@ -7,7 +7,7 @@ from scipy.spatial import KDTree
 
 from rclpy.node import Node 
 from std_msgs.msg import Float64MultiArray
-from geometry_msgs.msg import PoseWithCovarianceStamped
+from geometry_msgs.msg import PoseStamped
 
 
 class O3DNode(Node):
@@ -17,13 +17,13 @@ class O3DNode(Node):
         self.pcd_subscription = self.create_subscription(
             Float64MultiArray,
             'xyz_pointcloud',
-            self.waypoint_callback,
+            self.waypoint_generator,
             10
         )
 
         #subscription for current pose from amcl node
         self.amcl_subscription = self.create_subscription(
-            PoseWithCovarianceStamped,
+            PoseStamped,
             'current_pose',
             self.current_pose_callback,
             10
@@ -31,21 +31,24 @@ class O3DNode(Node):
 
         #subscription for goal location from target_point topic
         self.target_subscription = self.create_subscription(
-            PoseWithCovarianceStamped,
+            PoseStamped,
             'target_pose',
             self.target_callback,
             10
         )
+
+        self.current_pose = None
+        self.target_pose = None
     
     def current_pose_callback(self, msg):
-        return np.array([msg.pose.pose.position.x,
-                         msg.pose.pose.position.y,
-                         msg.pose.pose.position.z])
+        self.current_pose = np.array([msg.pose.position.x,
+                                 msg.pose.position.y,
+                                 msg.pose.position.z])
     
     def target_callback(self, msg):
-        return np.array([msg.pose.pose.position.x,
-                         msg.pose.pose.position.y,
-                         msg.pose.pose.position.z])
+        self.target_pose = np.array([msg.pose.position.x,
+                                msg.pose.position.y,
+                                msg.pose.position.z])
 
     def reshape_pcd(self, msg):
         points_dim = msg.layout.dim[0].size
@@ -53,7 +56,12 @@ class O3DNode(Node):
         pc_array = np.array(msg.data).reshape((points_dim, coords_dim))
         return pc_array
 
-    def filter_vertical_pts(downpcd, tolerance):
+    def filter_vertical_pts(self, pc_array, tolerance):
+        # prepare point cloud
+        downpcd = o3d.geometry.PointCloud()
+        downpcd.points = o3d.utility.Vector3dVector(pc_array)
+        downpcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
+
         # convert numpy array to tensor
         tensor = torch.from_numpy(np.asarray(downpcd.normals))
 
@@ -76,7 +84,7 @@ class O3DNode(Node):
 
         return pcd
 
-    def get_planar_patches(pcd):
+    def get_planar_patches(self, pcd):
     # find planar patches
         oboxes = pcd.detect_planar_patches(
             normal_variance_threshold_deg=60,
@@ -106,7 +114,7 @@ class O3DNode(Node):
 
         return inlier_arr, geometries
 
-    def find_nearest_pt(inlier_arr, target):
+    def find_nearest_pt(self, inlier_arr, target):
         # find nearest point to target from inlier pts
         plane_pts = np.vstack(inlier_arr)
         target = np.array([8, 0, 0.1])
@@ -119,7 +127,11 @@ class O3DNode(Node):
 
         return nearest_pt 
 
-    def waypoint_callback(self, msg):
+    def waypoint_generator(self, msg):
+        if self.target_pose is None:
+            self.get_logger().info('No target pose recieved.')
+            return 
+
         # Reshape 1d pcd to n x 3 array
         pc_array = self.reshape_pcd(msg)
 
@@ -133,9 +145,17 @@ class O3DNode(Node):
         # find nearest point in plane to target
         nearest_pt = self.find_nearest_pt(inlier_arr, self.target_pose)
 
-        self.get_logger().info(f'nearest_pt: {nearest_pt}')
+        
 
 
+
+        # self.get_logger().info(f'current_pose: {self.current_pose}')
+        # self.get_logger().info(f'nearest_pt: {nearest_pt}')
+        # self.get_logger().info('shutting down node')
+        # self.pcd_subscription.destroy()
+        # self.amcl_subscription.destroy()
+        # self.target_subscription.destroy()
+        # rclpy.shutdown()
 
 
 def main(args=None):

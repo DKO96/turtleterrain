@@ -12,9 +12,9 @@ class O3DNode(Node):
     def __init__(self):
         super().__init__('open3d_node')
 
-        self.vis = o3d.visualization.Visualizer()
-        self.vis.create_window()
-        self.o3d_pcd = o3d.geometry.PointCloud()
+        # self.vis = o3d.visualization.Visualizer()
+        # self.vis.create_window()
+        # self.o3d_pcd = o3d.geometry.PointCloud()
 
         self.subscription = self.create_subscription(
             Float64MultiArray,

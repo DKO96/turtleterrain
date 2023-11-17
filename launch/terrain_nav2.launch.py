@@ -33,7 +33,8 @@ def generate_launch_description():
             get_package_share_directory('turtleterrain'),
             'map',
             # 'map.yaml'))
-            'terrain_map.yaml'))
+            # 'empty_map.yaml'))
+            'tree_flat_terrain.yaml'))
 
     param_dir = LaunchConfiguration(
         'params_file',
