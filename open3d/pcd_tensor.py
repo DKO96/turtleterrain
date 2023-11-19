@@ -44,7 +44,7 @@ boundaries = boundaries.paint_uniform_color([0.0, 0.0, 1.0])
 # outlier_cloud_cpu = outlier_cloud.to(o3d.core.Device("CPU:0"))
 
 
-# o3d.visualization.draw_geometries([inlier_cloud.to_legacy(), boundaries.to_legacy()])
+o3d.visualization.draw_geometries([inlier_cloud.to_legacy(), boundaries.to_legacy()])
 
 
 end_time = time.time()
