@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import time
 import numpy as np
 import matplotlib.pyplot as plt
@@ -138,20 +137,6 @@ def cubicSplineSmoother(path, num_points):
     return waypoints
 
 def PathPlanner(points, start, end):
-    # # test set
-    # samples = 10000
-    # np.random.seed(0)
-    # x = np.random.rand(samples) * 1000
-    # y = np.random.rand(samples) * 1000
-    # z = np.random.rand(samples) * 1000
-    # points_xy = np.vstack((x,y))
-    # points = np.vstack((points_xy,z)).T
-    # points[0] = np.array([0,0,0])
-    # points[-1] = np.array([1000,1000,1000])
-
-    # start = points[0] 
-    # end = points[-1]
-
     start_time = time.time()
     nn = NearestNeighbors(n_neighbors=100, algorithm='kd_tree').fit(points) 
     path = bidirectional_a_star(start, end, nn, points)

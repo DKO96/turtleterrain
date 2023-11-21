@@ -56,10 +56,8 @@ class O3DNode(Node):
 
     def waypoint_generator(self, msg):
         pcd_array = self.reshape_pcd(msg)
-
-        nearest_point = ProcessCloud(pcd_array, self.target_pose)
-
-
+        pcd, nearest_point = ProcessCloud(pcd_array, self.target_pose)
+        waypoints = PathPlanner(pcd, self.current_pose, nearest_point)
 
 
 def main(args=None):

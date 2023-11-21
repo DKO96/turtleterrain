@@ -1,3 +1,4 @@
+#!usr/bin/env python3
 import time
 import torch
 import numpy as np
@@ -56,8 +57,10 @@ def ProcessCloud(np_pcd, target_coord):
     filtered_inlier_tensor = inlier_tensor[filtered_bound]
 
     # find nearest point to target
+    np_inlier_cloud = filtered_inlier_cloud.cpu().numpy()
     filtered_inlier_cloud = o3d.geometry.PointCloud()
-    filtered_inlier_cloud.points = o3d.utility.Vector3dVector(filtered_inlier_tensor.cpu().numpy())
+    filtered_inlier_cloud.points = o3d.utility.Vector3dVector(np_inlier_cloud)
 
-    return nearest_search(filtered_inlier_cloud, target_coord)
+    nearest_point = nearest_search(filtered_inlier_cloud, target_coord)
 
+    return np_inlier_cloud, nearest_point

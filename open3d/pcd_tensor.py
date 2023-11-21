@@ -80,8 +80,9 @@ robot = o3d.geometry.PointCloud()
 robot.points = o3d.utility.Vector3dVector(np.array([[0.044, 0.395, 0]]))
 robot.paint_uniform_color([0, 0, 1])
 
+np_inlier_cloud = filtered_inlier_tensor.cpu().numpy()
 filtered_inlier_cloud = o3d.geometry.PointCloud()
-filtered_inlier_cloud.points = o3d.utility.Vector3dVector(filtered_inlier_tensor.cpu().numpy())
+filtered_inlier_cloud.points = o3d.utility.Vector3dVector(np_inlier_cloud)
 filtered_inlier_cloud.paint_uniform_color([0.5, 0.5, 0.5])
 
 # find nearest point to target point 
@@ -96,11 +97,10 @@ nearest_point_pcd.paint_uniform_color([0, 1, 0])
 end_time = time.time()
 print(f'Execution time: {end_time - start_time}')
 
-o3d.io.write_point_cloud('surface_points_tensor.xyz', filtered_inlier_cloud)
+# o3d.io.write_point_cloud('surface_points_tensor.xyz', filtered_inlier_cloud)
 
 o3d.visualization.draw_geometries([inlier_cloud.to_legacy(), filtered_inlier_cloud, robot, nearest_point_pcd])
 
-# o3d.visualization.draw_geometries([inlier_cloud.to_legacy()])
 
 
 
