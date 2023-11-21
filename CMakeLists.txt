@@ -92,8 +92,7 @@ install(PROGRAMS
   scripts/path_planning.py
   scripts/cloud_processing.py
   
-  scripts/pc_visualizer_node.py
-  scripts/planar_patch_detection_node.py
+  scripts/pc_snapshot_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

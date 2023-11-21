@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import time
 import numpy as np
-import matplotlib.pyplot as plt
 import heapq
 from sklearn.neighbors import NearestNeighbors
 from scipy.interpolate import CubicSpline
@@ -40,10 +39,10 @@ def reconstructPath(forward_node, backward_node, start_node, goal_node):
 
     return start_path + goal_path[1:]
 
-def neighbourSearch(node, nn, points):
+def neighbourSearch(node, nn, points, threshold=1e-4):
     distances, indices = nn.kneighbors(node.coordinate.reshape(1,-1))
     indices = indices.reshape(-1)
-    return indices[indices != np.where((points == node.coordinate).all(axis=1))[0][0]]
+    return indices
 
 def path_update(open_heap, node_dict, close_set, current_node, target_coord, points, nn):
     neighbours = neighbourSearch(current_node, nn, points)
@@ -141,7 +140,7 @@ def PathPlanner(points, start, end):
     nn = NearestNeighbors(n_neighbors=100, algorithm='kd_tree').fit(points) 
     path = bidirectional_a_star(start, end, nn, points)
     end_time = time.time()
-    print(f'Execution time: {end_time - start_time}')
+    # print(f'Execution time: {end_time - start_time}')
 
     num_points = 10
     waypoints = cubicSplineSmoother(path, num_points)

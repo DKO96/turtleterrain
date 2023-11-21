@@ -34,12 +34,12 @@ def nearest_search(filtered_inlier_cloud, target_point):
 
 def ProcessCloud(np_pcd, target_coord):
     # read np point cloud and convert to CUDA
-    pcd_cpu = o3d.geometry.PointCloud()
-    pcd_cpu.points = o3d.utility.Vector3dVectory(np_pcd)
-    pcd = pcd_cpu.to(o3d.core.Device("cuda:0"))
+    pcd = o3d.t.geometry.PointCloud(np_pcd)
+    tensor_pcd = o3d.t.geometry.PointCloud.from_legacy(pcd.to_legacy())
+    pcd_gpu = tensor_pcd.to(device=o3d.core.Device("cuda:0"))
 
     # point cloud pre-processing    
-    downpcd = pcd.voxel_down_sample(voxel_size=0.025)
+    downpcd = pcd_gpu.voxel_down_sample(voxel_size=0.025)
     downpcd.estimate_normals(max_nn=30, radius=0.1)
 
     # fit plane
@@ -54,7 +54,7 @@ def ProcessCloud(np_pcd, target_coord):
     filtered_bound = torch.ones(inlier_tensor.shape[0], dtype=torch.bool, device='cuda:0')
     for boundary_pt in boundary_tensor:
         filtered_bound = torch.logical_and(filtered_bound, filter_cloud(boundary_pt, inlier_tensor, 0.1))
-    filtered_inlier_tensor = inlier_tensor[filtered_bound]
+    filtered_inlier_cloud = inlier_tensor[filtered_bound]
 
     # find nearest point to target
     np_inlier_cloud = filtered_inlier_cloud.cpu().numpy()

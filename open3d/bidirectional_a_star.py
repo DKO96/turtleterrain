@@ -42,7 +42,9 @@ def reconstructPath(forward_node, backward_node, start_node, goal_node):
 def neighbourSearch(node, nn, points):
     distances, indices = nn.kneighbors(node.coordinate.reshape(1,-1))
     indices = indices.reshape(-1)
-    return indices[indices != np.where((points == node.coordinate).all(axis=1))[0][0]]
+    print(f'node coord: {node.coordinate}')
+    # return indices[indices != np.where((points == node.coordinate).all(axis=1))[0][0]]
+    return indices
 
 def path_update(open_heap, node_dict, close_set, current_node, target_coord, points, nn):
     neighbours = neighbourSearch(current_node, nn, points)
@@ -164,27 +166,27 @@ def main():
     num = 8
     waypoints = cubicSplineSmoother(path, num)
 
-    if path:
-        # Converting the path into a format suitable for plotting
-        path_points = np.array(path)
+    # if path:
+    #     # Converting the path into a format suitable for plotting
+    #     path_points = np.array(path)
     
-        fig = plt.figure(figsize=(9, 9))
-        ax = fig.add_subplot(111, projection='3d')
+    #     fig = plt.figure(figsize=(9, 9))
+    #     ax = fig.add_subplot(111, projection='3d')
         
-        # Scatter plot for the points
-        # ax.scatter(points[:, 0], points[:, 1], points[:, 2], color='blue', marker='o', label='Point Cloud')
+    #     # Scatter plot for the points
+    #     # ax.scatter(points[:, 0], points[:, 1], points[:, 2], color='blue', marker='o', label='Point Cloud')
     
-        # Line plot for the path
-        ax.plot(path_points[:, 0], path_points[:, 1], path_points[:, 2], color='red', linewidth=2, label='Path')
-        ax.plot(waypoints[:, 0], waypoints[:, 1], waypoints[:, 2], color='green', linewidth=2, label='Cubic Path')
+    #     # Line plot for the path
+    #     ax.plot(path_points[:, 0], path_points[:, 1], path_points[:, 2], color='red', linewidth=2, label='Path')
+    #     ax.plot(waypoints[:, 0], waypoints[:, 1], waypoints[:, 2], color='green', linewidth=2, label='Cubic Path')
     
-        ax.set_title("3D A* Pathfinding")
-        ax.set_xlabel("X-axis")
-        ax.set_ylabel("Y-axis")
-        ax.set_zlabel("Z-axis")
-        ax.legend()
-        ax.grid(True)
-        plt.show()
+    #     ax.set_title("3D A* Pathfinding")
+    #     ax.set_xlabel("X-axis")
+    #     ax.set_ylabel("Y-axis")
+    #     ax.set_zlabel("Z-axis")
+    #     ax.legend()
+    #     ax.grid(True)
+    #     plt.show()
 
 
 

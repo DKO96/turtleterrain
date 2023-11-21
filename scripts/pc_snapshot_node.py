@@ -10,7 +10,7 @@ from std_msgs.msg import Float64MultiArray
 
 class O3DNode(Node):
     def __init__(self):
-        super().__init__('open3d_node')
+        super().__init__('snapshot_node')
 
         # self.vis = o3d.visualization.Visualizer()
         # self.vis.create_window()
