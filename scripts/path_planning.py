@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import heapq
 from sklearn.neighbors import NearestNeighbors
-
+from scipy.interpolate import CubicSpline
 
 class Node:
     def __init__(self, G=0, H=0, coordinate=None, parent=None):
@@ -118,6 +118,24 @@ def bidirectional_a_star(start, end, nn, points):
                                                                 origin.coordinate, points, nn)
     return None
 
+def cubicSplineSmoother(path, num_points):
+    path_arr = np.array(path)
+    x = path_arr[:,0]
+    y = path_arr[:,1]
+    z = path_arr[:,2]
+    t = np.arange(len(path))
+
+    spline_x = CubicSpline(t, x)
+    spline_y = CubicSpline(t, y)
+    spline_z = CubicSpline(t, z)
+
+    t_reduced = np.linspace(t.min(), t.max(), num_points)
+    waypoints = np.column_stack((
+        spline_x(t_reduced),
+        spline_y(t_reduced),
+        spline_z(t_reduced)
+    ))
+    return waypoints
 
 def PathPlanner(points, start, end):
     # # test set
@@ -140,7 +158,10 @@ def PathPlanner(points, start, end):
     end_time = time.time()
     print(f'Execution time: {end_time - start_time}')
 
-    return path
+    num_points = 10
+    waypoints = cubicSplineSmoother(path, num_points)
+
+    return waypoints
 
 
 

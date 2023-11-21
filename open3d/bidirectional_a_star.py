@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import heapq
 from sklearn.neighbors import NearestNeighbors
+from scipy.interpolate import CubicSpline
 
 class Node:
     def __init__(self, G=0, H=0, coordinate=None, parent=None):
@@ -115,30 +116,53 @@ def bidirectional_a_star(start, end, nn, points):
                                                                 origin.coordinate, points, nn)
     return None
 
+def cubicSplineSmoother(path, num):
+    path_arr = np.array(path)
+    x = path_arr[:,0]
+    y = path_arr[:,1]
+    z = path_arr[:,2]
+    t = np.arange(len(path))
+
+    spline_x = CubicSpline(t, x)
+    spline_y = CubicSpline(t, y)
+    spline_z = CubicSpline(t, z)
+
+    t_reduced = np.linspace(t.min(), t.max(), num)
+    waypoints = np.column_stack((
+        spline_x(t_reduced),
+        spline_y(t_reduced),
+        spline_z(t_reduced)
+    ))
+    return waypoints
+
 
 def main():
     # test set
-    # samples = 10000
-    # np.random.seed(0)
-    # x = np.random.rand(samples) * 1000
-    # y = np.random.rand(samples) * 1000
-    # z = np.random.rand(samples) * 1000
-    # points_xy = np.vstack((x,y))
-    # points = np.vstack((points_xy,z)).T
-    # points[0] = np.array([0,0,0])
-    # points[-1] = np.array([1000,1000,1000])
+    samples = 15000
+    np.random.seed(0)
+    x = np.random.rand(samples) * 2000
+    y = np.random.rand(samples) * 2000
+    z = np.random.rand(samples) * 2000
+    points_xy = np.vstack((x,y))
+    points = np.vstack((points_xy,z)).T
+    points[0] = np.array([0,0,0])
+    points[-1] = np.array([2000,2000,2000])
 
-    points = np.loadtxt('surface_points_tensor.xyz')
-    print(f'# of points: {len(points)}')
+    # points = np.loadtxt('surface_points_tensor.xyz')
+    # print(f'# of points: {len(points)}')
 
     start = points[0] 
     end = points[-1]
 
     start_time = time.time()
-    nn = NearestNeighbors(n_neighbors=100, algorithm='ball_tree').fit(points) 
+    nn = NearestNeighbors(n_neighbors=45, algorithm='ball_tree').fit(points) 
     path = bidirectional_a_star(start, end, nn, points)
     end_time = time.time()
     print(f'Execution time: {end_time - start_time}')
+    
+    print(f'# of points in path: {len(path)}')
+    num = 8
+    waypoints = cubicSplineSmoother(path, num)
 
     if path:
         # Converting the path into a format suitable for plotting
@@ -148,10 +172,11 @@ def main():
         ax = fig.add_subplot(111, projection='3d')
         
         # Scatter plot for the points
-        ax.scatter(points[:, 0], points[:, 1], points[:, 2], color='blue', marker='o', label='Point Cloud')
+        # ax.scatter(points[:, 0], points[:, 1], points[:, 2], color='blue', marker='o', label='Point Cloud')
     
         # Line plot for the path
         ax.plot(path_points[:, 0], path_points[:, 1], path_points[:, 2], color='red', linewidth=2, label='Path')
+        ax.plot(waypoints[:, 0], waypoints[:, 1], waypoints[:, 2], color='green', linewidth=2, label='Cubic Path')
     
         ax.set_title("3D A* Pathfinding")
         ax.set_xlabel("X-axis")
