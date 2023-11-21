@@ -28,7 +28,7 @@ class O3DNode(Node):
         coords_dim = msg.layout.dim[1].size
         pc_array = np.array(msg.data).reshape((points_dim, coords_dim))
 
-        np.savetxt('pc_snapshot_uneven_tree_terrain_1.xyz', pc_array)
+        np.savetxt('pc_snapshot_uneven_tree_terrain_3.xyz', pc_array)
         self.get_logger().info(f'xyz format shape: {pc_array}')
         self.get_logger().info('shutting down node')
         self.subscription.destroy()

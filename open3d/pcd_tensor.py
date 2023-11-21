@@ -6,7 +6,7 @@ import open3d as o3d
 start_time = time.time()
 
 # read xyz point cloud
-pcd_cpu = o3d.t.io.read_point_cloud('pc_snapshot_uneven_tree_terrain_1.xyz')
+pcd_cpu = o3d.t.io.read_point_cloud('pc_snapshot_uneven_tree_terrain_3.xyz')
 
 # use CUDA
 pcd = pcd_cpu.to(o3d.core.Device("cuda:0"))
@@ -37,7 +37,7 @@ outlier_cloud = downpcd.select_by_index(inliers, invert=True)
 inlier_cloud, _ = inlier_cloud.remove_statistical_outliers(nb_neighbors=5, std_ratio=1.0)
 
 # find boundaries of plane inlier cloud
-boundary_cloud, mask = inlier_cloud.compute_boundary_points(0.1, 30)
+boundary_cloud, mask = inlier_cloud.compute_boundary_points(0.5, 60)
 # print(f"Detect {boundary_cloud.point.positions.shape[0]} boundary points from {inlier_cloud.point.positions.shape[0]} points.")
 # boundaries = boundary_cloud.paint_uniform_color([0.0, 0.0, 1.0])
 
@@ -49,45 +49,58 @@ inlier_tensor = torch.tensor(inlier_cpu.point.positions.numpy(), device='cuda:0'
 boundary_cpu = boundary_cloud.to(o3d.core.Device('CPU:0'))
 boundary_tensor = torch.tensor(boundary_cpu.point.positions.numpy(), device='cuda:0')
 
-dist = torch.tensor(0.1, device='cuda:0')
-tolerance = 0.02
-
-def filter_cloud(boundary_pt, inlier_pts, batch_size=5000):
+def filter_cloud(boundary_pt, inlier_pts, desired_dist, batch_size=5000):
     num_points = inlier_pts.shape[0]
     update_inlier = torch.ones(num_points, dtype=torch.bool, device='cuda:0') 
 
     for i in range(0, num_points, batch_size):
         end = min(i+batch_size, num_points)
         distances = torch.linalg.norm(inlier_pts[i:end] - boundary_pt, dim=1)
-        close_mask = distances <= dist 
+        close_mask = distances <= desired_dist
         update_inlier[i:end] = torch.logical_and(update_inlier[i:end], ~close_mask) 
-        # print(update_inlier)
     return update_inlier
 
-robot_tensor = torch.tensor([], device='cuda:0')
-filtered_dist = torch.ones(inlier_tensor.shape[0], dtype=torch.bool, device='cuda:0')
-filtered_bound = torch.logical_and(filtered_dist, filter_cloud(robot_tensor, inlier_tensor))
-filtered_inlier_tensor = inlier_tensor[filtered_bound]
+# robot_tensor = torch.tensor([0.005, 0.519, 0], device='cuda:0')
+# filtered_dist = torch.ones(inlier_tensor.shape[0], dtype=torch.bool, device='cuda:0')
+# filtered_dist = torch.logical_and(filtered_dist, ~filter_cloud(robot_tensor, inlier_tensor, 2))
+# filtered_inlier_dist = inlier_tensor[filtered_dist]
 
-
+# filtered_bound = torch.ones(filtered_inlier_dist.shape[0], dtype=torch.bool, device='cuda:0')
+# for boundary_pt in boundary_tensor:
+#     filtered_bound = torch.logical_and(filtered_bound, filter_cloud(boundary_pt, filtered_inlier_dist, 0.1))
+# filtered_inlier_tensor = filtered_inlier_dist[filtered_bound]
 
 filtered_bound = torch.ones(inlier_tensor.shape[0], dtype=torch.bool, device='cuda:0')
 for boundary_pt in boundary_tensor:
-    filtered_bound = torch.logical_and(filtered_bound, filter_cloud(boundary_pt, inlier_tensor))
-
+    filtered_bound = torch.logical_and(filtered_bound, filter_cloud(boundary_pt, inlier_tensor, 0.1))
 filtered_inlier_tensor = inlier_tensor[filtered_bound]
 
-# output_pcd = inlier_cloud.to_legacy()
-# o3d.io.write_point_cloud('surface_points_tensor.xyz', output_pcd)
+# switch back to cpu
+robot = o3d.geometry.PointCloud()
+robot.points = o3d.utility.Vector3dVector(np.array([[0.044, 0.395, 0]]))
+robot.paint_uniform_color([0, 0, 1])
+
+filtered_inlier_cloud = o3d.geometry.PointCloud()
+filtered_inlier_cloud.points = o3d.utility.Vector3dVector(filtered_inlier_tensor.cpu().numpy())
+filtered_inlier_cloud.paint_uniform_color([0.5, 0.5, 0.5])
+
+# find nearest point to target point 
+pcd_tree = o3d.geometry.KDTreeFlann(filtered_inlier_cloud)
+target_point = np.array([-5, -5, 0])
+[k, idx, _] = pcd_tree.search_knn_vector_3d(target_point, 1)
+nearest_point = np.asarray(filtered_inlier_cloud.points)[idx[0]]
+nearest_point_pcd = o3d.geometry.PointCloud()
+nearest_point_pcd.points = o3d.utility.Vector3dVector([nearest_point])
+nearest_point_pcd.paint_uniform_color([0, 1, 0])
 
 end_time = time.time()
 print(f'Execution time: {end_time - start_time}')
 
-filtered_inlier_cloud = o3d.geometry.PointCloud()
-filtered_inlier_cloud.points = o3d.utility.Vector3dVector(filtered_inlier_tensor.cpu().numpy())
-filtered_inlier_cloud.paint_uniform_color([0, 1, 0])
-# o3d.visualization.draw_geometries([inlier_cloud.to_legacy(), boundaries.to_legacy()])
-o3d.visualization.draw_geometries([filtered_inlier_cloud, boundary_cloud.to_legacy()])
+o3d.io.write_point_cloud('surface_points_tensor.xyz', filtered_inlier_cloud)
+
+o3d.visualization.draw_geometries([inlier_cloud.to_legacy(), filtered_inlier_cloud, robot, nearest_point_pcd])
+
+# o3d.visualization.draw_geometries([inlier_cloud.to_legacy()])
 
 
 

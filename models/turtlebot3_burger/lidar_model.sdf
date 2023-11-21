@@ -131,13 +131,13 @@
 
       <sensor name="velodyne-VLP32E" type="gpu_ray">
         <always_on>true</always_on>
-        <visualize>false</visualize>
+        <visualize>true</visualize>
         <pose>0 0 0.171 0 0 3.141</pose>
         <update_rate>10</update_rate>
         <ray>
           <scan>
             <horizontal>
-              <samples>1000</samples>
+              <samples>750</samples>
               <resolution>1.000000</resolution>
               <min_angle>1.74533</min_angle>
               <max_angle>4.53786</max_angle>
@@ -146,7 +146,7 @@
                 <samples>256</samples>
                 <resolution>1</resolution>
                 <min_angle>-0.523599</min_angle>
-                <max_angle>0.0</max_angle>
+                <max_angle>-0.085</max_angle>
               </vertical>
           </scan>
           <range>

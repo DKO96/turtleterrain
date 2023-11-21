@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import heapq
 from sklearn.neighbors import NearestNeighbors
 
+
 class Node:
     def __init__(self, G=0, H=0, coordinate=None, parent=None):
         self.coordinate = coordinate
@@ -139,6 +140,7 @@ def PathPlanner(points, start, end):
     end_time = time.time()
     print(f'Execution time: {end_time - start_time}')
 
+    return path
 
 
 

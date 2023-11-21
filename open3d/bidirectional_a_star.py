@@ -118,18 +118,18 @@ def bidirectional_a_star(start, end, nn, points):
 
 def main():
     # test set
-    samples = 10000
-    np.random.seed(0)
-    x = np.random.rand(samples) * 1000
-    y = np.random.rand(samples) * 1000
-    z = np.random.rand(samples) * 1000
-    points_xy = np.vstack((x,y))
-    points = np.vstack((points_xy,z)).T
-    points[0] = np.array([0,0,0])
-    points[-1] = np.array([1000,1000,1000])
+    # samples = 10000
+    # np.random.seed(0)
+    # x = np.random.rand(samples) * 1000
+    # y = np.random.rand(samples) * 1000
+    # z = np.random.rand(samples) * 1000
+    # points_xy = np.vstack((x,y))
+    # points = np.vstack((points_xy,z)).T
+    # points[0] = np.array([0,0,0])
+    # points[-1] = np.array([1000,1000,1000])
 
-    # points = np.loadtxt('surface_points_tensor.xyz')
-    # print(f'# of points: {len(points)}')
+    points = np.loadtxt('surface_points_tensor.xyz')
+    print(f'# of points: {len(points)}')
 
     start = points[0] 
     end = points[-1]

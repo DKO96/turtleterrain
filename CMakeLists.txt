@@ -84,13 +84,16 @@ ament_python_install_package(${PROJECT_NAME})
 
 # Install Python executables
 install(PROGRAMS
+  scripts/target_pose_pub.py
   scripts/pcd_subscriber_node.py
-  scripts/pc_visualizer_node.py
   scripts/path_follower_node.py
-  scripts/planar_patch_detection_node.py
-  scripts/target_pose_pub.py
-  scripts/target_pose_pub.py
+  scripts/path_planner_node.py
+
   scripts/path_planning.py
+  scripts/cloud_processing.py
+  
+  scripts/pc_visualizer_node.py
+  scripts/planar_patch_detection_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
