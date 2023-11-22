@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import rclpy
 from rclpy.action import ActionClient
 from rclpy.node import Node
@@ -7,7 +6,6 @@ from nav2_msgs.action import NavigateToPose
 from geometry_msgs.msg import PoseStamped
 
 class Nav2WaypointFollower(Node):
-
     def __init__(self, waypoints):
         super().__init__('path_follower_node')
         self._action_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
