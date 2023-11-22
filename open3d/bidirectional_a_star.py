@@ -140,18 +140,18 @@ def cubicSplineSmoother(path, num):
 
 def main():
     # test set
-    samples = 15000
-    np.random.seed(0)
-    x = np.random.rand(samples) * 2000
-    y = np.random.rand(samples) * 2000
-    z = np.random.rand(samples) * 2000
-    points_xy = np.vstack((x,y))
-    points = np.vstack((points_xy,z)).T
-    points[0] = np.array([0,0,0])
-    points[-1] = np.array([2000,2000,2000])
+    # samples = 15000
+    # np.random.seed(0)
+    # x = np.random.rand(samples) * 2000
+    # y = np.random.rand(samples) * 2000
+    # z = np.random.rand(samples) * 2000
+    # points_xy = np.vstack((x,y))
+    # points = np.vstack((points_xy,z)).T
+    # points[0] = np.array([0,0,0])
+    # points[-1] = np.array([2000,2000,2000])
 
-    # points = np.loadtxt('surface_points_tensor.xyz')
-    # print(f'# of points: {len(points)}')
+    points = np.loadtxt('surface_points_tensor.xyz')
+    print(f'# of points: {len(points)}')
 
     start = points[0] 
     end = points[-1]

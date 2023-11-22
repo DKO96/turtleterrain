@@ -1,16 +1,16 @@
 amcl:
   ros__parameters:
     use_sim_time: False
-    # alpha1: 0.2
-    # alpha2: 0.2
-    # alpha3: 0.2
-    # alpha4: 0.2
-    # alpha5: 0.2
-    alpha1: 0.4
-    alpha2: 0.4
-    alpha3: 0.4
-    alpha4: 0.4
-    alpha5: 0.4
+    alpha1: 0.2
+    alpha2: 0.2
+    alpha3: 0.2
+    alpha4: 0.2
+    alpha5: 0.2
+    # alpha1: 0.4
+    # alpha2: 0.4
+    # alpha3: 0.4
+    # alpha4: 0.4
+    # alpha5: 0.4
     base_frame_id: "base_footprint"
     beam_skip_distance: 0.5
     beam_skip_error_threshold: 0.9
@@ -19,7 +19,7 @@ amcl:
     global_frame_id: "map"
     lambda_short: 0.1
     laser_likelihood_max_dist: 2.0
-    laser_max_range: 100.0
+    laser_max_range: 10.0
     laser_min_range: -1.0
     laser_model_type: "likelihood_field"
     max_beams: 60
@@ -107,7 +107,8 @@ bt_navigator_rclcpp_node:
 controller_server:
   ros__parameters:
     use_sim_time: False
-    controller_frequency: 10.0
+    # controller_frequency: 10.0
+    controller_frequency: 1.0
     min_x_velocity_threshold: 0.001
     min_y_velocity_threshold: 0.5
     min_theta_velocity_threshold: 0.001
@@ -127,6 +128,8 @@ controller_server:
       plugin: "nav2_controller::SimpleGoalChecker"
       xy_goal_tolerance: 0.1
       yaw_goal_tolerance: 0.1
+      # xy_goal_tolerance: 0.05
+      # yaw_goal_tolerance: 0.05
 
     # DWB parameters
     FollowPath:
@@ -309,12 +312,14 @@ map_saver:
 
 planner_server:
   ros__parameters:
-    expected_planner_frequency: 20.0
+    # expected_planner_frequency: 20.0
+    expected_planner_frequency: 10.0
     use_sim_time: False
     planner_plugins: ["GridBased"]
     GridBased:
       plugin: "nav2_navfn_planner/NavfnPlanner"
-      tolerance: 0.5
+      # tolerance: 0.5
+      tolerance: 0.25
       use_astar: false
       allow_unknown: true
 
@@ -354,5 +359,5 @@ waypoint_follower:
     waypoint_task_executor_plugin: "wait_at_waypoint"   
     wait_at_waypoint:
       plugin: "nav2_waypoint_follower::WaitAtWaypoint"
-      enabled: True
+      enabled: False
       waypoint_pause_duration: 200

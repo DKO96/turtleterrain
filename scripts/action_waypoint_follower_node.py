@@ -1,19 +1,25 @@
 #!/usr/bin/env python3
+import numpy as np
 import rclpy
-from rclpy.node import Node
-from nav2_msgs.action import FollowWaypoints
-from geometry_msgs.msg import PoseStamped
-from action_msgs.msg import GoalStatus
-from rclpy.action import ActionClient
-from geometry_msgs.msg import PoseStamped
-from geometry_msgs.msg import Point
-from geometry_msgs.msg import Quaternion
 import rclpy.time
+from rclpy.node import Node
+from rclpy.action import ActionClient
+from geometry_msgs.msg import PoseStamped, Point, Quaternion
+from nav2_msgs.action import FollowWaypoints
+from action_msgs.msg import GoalStatus
+from std_msgs.msg import Float64MultiArray
+
 
 class WaypointFollower(Node):
     def __init__(self):
         super().__init__('waypoint_follower')
         self._action_client = ActionClient(self, FollowWaypoints, '/follow_waypoints')
+
+        self.waypoint_subscriber = self.create_subscription(
+            Float64MultiArray,
+            'waypoint_publisher',
+            self.waypoint_callback,
+            10)
 
     def send_waypoints(self, waypoints):
         goal_msg = FollowWaypoints.Goal()
@@ -35,6 +41,7 @@ class WaypointFollower(Node):
 
     def feedback_callback(self, feedback_msg):
         feedback = feedback_msg.feedback
+        self.get_logger().info(f'current waypoint: {feedback}')
         # Handle feedback here (e.g., current waypoint)
 
     def get_result_callback(self, future):
@@ -44,6 +51,12 @@ class WaypointFollower(Node):
             self.get_logger().info('Navigation succeeded')
         else:
             self.get_logger().info('Navigation failed')
+
+    def waypoint_callback(self, msg):
+        num_waypoints = msg.layout.dim[0].size
+        num_coords = msg.layout.dim[1].size
+        waypoint_array = np.array(msg.data).reshape
+
 
     def create_waypoint(x, y, z):
         waypoint = PoseStamped()
@@ -63,9 +76,22 @@ def main(args=None):
     waypoints = [
         # Populate with PoseStamped waypoints
         WaypointFollower.create_waypoint(0.3, 0.3, -0.175),
+        WaypointFollower.create_waypoint(0.4, 0.4, -0.175),
         WaypointFollower.create_waypoint(0.5, 0.5, -0.175),
+        WaypointFollower.create_waypoint(0.6, 0.6, -0.175),
         WaypointFollower.create_waypoint(0.7, 0.7, -0.175),
+        WaypointFollower.create_waypoint(0.8, 0.8, -0.175),
+        WaypointFollower.create_waypoint(0.9, 0.9, -0.175),
         WaypointFollower.create_waypoint(1.0, 1.0, -0.175),
+        
+        # WaypointFollower.create_waypoint(1.0, 1.0, -0.175),
+        # WaypointFollower.create_waypoint(0.9, 0.9, -0.175),
+        # WaypointFollower.create_waypoint(0.8, 0.8, -0.175),
+        # WaypointFollower.create_waypoint(0.7, 0.7, -0.175),
+        # WaypointFollower.create_waypoint(0.6, 0.6, -0.175),
+        # WaypointFollower.create_waypoint(0.5, 0.5, -0.175),
+        # WaypointFollower.create_waypoint(0.4, 0.4, -0.175),
+        # WaypointFollower.create_waypoint(0.3, 0.3, -0.175),
     ]
 
     waypoint_follower.send_waypoints(waypoints)

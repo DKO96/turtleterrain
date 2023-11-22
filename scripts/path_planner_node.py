@@ -22,37 +22,32 @@ class O3DNode(Node):
             Float64MultiArray,
             'xyz_pointcloud',
             self.waypoint_generator,
-            10
-        )
+            10)
 
         # subscription for current pose from amcl_pose and odom
         self.amcl_subscription = self.create_subscription(
             PoseWithCovarianceStamped,
             'amcl_position',
             self.amcl_pose_callback,
-            10
-        )
+            10)
         self.odom_subscription = self.create_subscription(
             Odometry,
             'odom',
             self.odom_pose_callback,
-            10
-        )
+            10)
         
         # subscription for goal location from target_point topic
         self.target_subscription = self.create_subscription(
             PoseStamped,
             'target_pose',
             self.target_callback,
-            10
-        )
+            10)
 
         # publisher for waypoints
         self.waypoint_publisher = self.create_publisher(
             Float64MultiArray,
             'waypoint_publisher',
-            10
-        )
+            10)
 
     def target_callback(self, msg):
         self.target_pose = np.array([msg.pose.position.x,
