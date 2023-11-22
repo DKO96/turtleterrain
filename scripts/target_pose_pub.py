@@ -35,7 +35,7 @@ class TargetPublisher(Node):
         # msg.pose.orientation.w = 1.0
         
         self.target_publisher.publish(msg)
-        self.get_logger().info(f'Publishing: {msg}')
+        # self.get_logger().info(f'Publishing: {msg}')
 
 
 def main(args=None):

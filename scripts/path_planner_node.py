@@ -28,7 +28,7 @@ class O3DNode(Node):
         # subscription for current pose from amcl_pose and odom
         self.amcl_subscription = self.create_subscription(
             PoseWithCovarianceStamped,
-            'amcl_pose',
+            'amcl_position',
             self.amcl_pose_callback,
             10
         )
@@ -38,7 +38,7 @@ class O3DNode(Node):
             self.odom_pose_callback,
             10
         )
-
+        
         # subscription for goal location from target_point topic
         self.target_subscription = self.create_subscription(
             PoseStamped,
@@ -60,9 +60,9 @@ class O3DNode(Node):
                                      msg.pose.position.z])
     
     def amcl_pose_callback(self, msg):
-        self.amcl_pose = np.array([msg.pose.position.x,
-                                   msg.pose.position.y,
-                                   msg.pose.position.z])
+        self.amcl_pose = np.array([msg.pose.pose.position.x,
+                                   msg.pose.pose.position.y,
+                                   msg.pose.pose.position.z])
         self.update_current_pose()
     
     def odom_pose_callback(self, msg):

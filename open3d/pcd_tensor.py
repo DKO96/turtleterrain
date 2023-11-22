@@ -6,7 +6,7 @@ import open3d as o3d
 start_time = time.time()
 
 # read xyz point cloud
-pcd_cpu = o3d.t.io.read_point_cloud('pc_snapshot_uneven_tree_terrain_3.xyz')
+pcd_cpu = o3d.t.io.read_point_cloud('Images/flat_uneven_test1.xyz')
 
 # use CUDA
 pcd = pcd_cpu.to(o3d.core.Device("cuda:0"))
@@ -87,7 +87,7 @@ filtered_inlier_cloud.paint_uniform_color([0.5, 0.5, 0.5])
 
 # find nearest point to target point 
 pcd_tree = o3d.geometry.KDTreeFlann(filtered_inlier_cloud)
-target_point = np.array([-5, -5, 0])
+target_point = np.array([1, 1, 0])
 [k, idx, _] = pcd_tree.search_knn_vector_3d(target_point, 1)
 nearest_point = np.asarray(filtered_inlier_cloud.points)[idx[0]]
 nearest_point_pcd = o3d.geometry.PointCloud()
@@ -99,6 +99,7 @@ print(f'Execution time: {end_time - start_time}')
 
 # o3d.io.write_point_cloud('surface_points_tensor.xyz', filtered_inlier_cloud)
 
+print(f'nearest point: {nearest_point}')
 o3d.visualization.draw_geometries([inlier_cloud.to_legacy(), filtered_inlier_cloud, robot, nearest_point_pcd])
 
 

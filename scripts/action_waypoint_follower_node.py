@@ -62,10 +62,10 @@ def main(args=None):
     # Define your waypoints here
     waypoints = [
         # Populate with PoseStamped waypoints
-        WaypointFollower.create_waypoint(0.0, 1.0, 0.0),
-        WaypointFollower.create_waypoint(1.0, 2.0, 0.0),
-        WaypointFollower.create_waypoint(2.0, 3.0, 0.0),
-        WaypointFollower.create_waypoint(3.0, 4.0, 0.0)
+        WaypointFollower.create_waypoint(0.3, 0.3, -0.175),
+        WaypointFollower.create_waypoint(0.5, 0.5, -0.175),
+        WaypointFollower.create_waypoint(0.7, 0.7, -0.175),
+        WaypointFollower.create_waypoint(1.0, 1.0, -0.175),
     ]
 
     waypoint_follower.send_waypoints(waypoints)

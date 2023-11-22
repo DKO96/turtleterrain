@@ -29,104 +29,49 @@ from launch_ros.actions import Node
 def generate_launch_description():
     launch_file_dir = os.path.join(get_package_share_directory('turtleterrain'), 'launch')
     pkg_gazebo_ros = get_package_share_directory('gazebo_ros')
-    slam_params_file = LaunchConfiguration('slam_params_file')
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     x_pose = LaunchConfiguration('x_pose', default='-2.0')
     y_pose = LaunchConfiguration('y_pose', default='-0.5')
 
     world = os.path.join(
-        get_package_share_directory('turtleterrain'),
-        'worlds',
-        'turtlebot3_world.world'
-    )
+        get_package_share_directory('turtleterrain'), 'worlds', 'turtlebot3_world.world')
 
-    rviz_config_dir = os.path.join(
-        get_package_share_directory('turtleterrain'),
-        'rviz',
-        'turtleterrain_gazebo.rviz'
-    )
-
+    # gazebo client and server nodes
     gzserver_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(pkg_gazebo_ros, 'launch', 'gzserver.launch.py')
-        ),
-        launch_arguments={'world': world}.items()
-    )
+            os.path.join(pkg_gazebo_ros, 'launch', 'gzserver.launch.py')),
+        launch_arguments={'world': world}.items())
 
     gzclient_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(pkg_gazebo_ros, 'launch', 'gzclient.launch.py')
-        )
-    )
+            os.path.join(pkg_gazebo_ros, 'launch', 'gzclient.launch.py')))
 
+    # robot state publisher
     robot_state_publisher_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'robot_state_publisher.launch.py')
-        ),
-        launch_arguments={'use_sim_time': use_sim_time}.items()
-    )
+            os.path.join(launch_file_dir, 'robot_state_publisher.launch.py')),
+        launch_arguments={'use_sim_time': use_sim_time}.items())
 
+    # spawn robot
     spawn_turtlebot_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'spawn_turtlebot3.launch.py')
-        ),
+            os.path.join(launch_file_dir, 'spawn_turtlebot3.launch.py')),
         launch_arguments={
             'x_pose': x_pose,
-            'y_pose': y_pose
-        }.items()
-    )
-
-    rviz_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz2',
-        arguments=['-d', rviz_config_dir],
-        output='screen'
-    )
-
-    # Navigation Stack
-    map_dir = LaunchConfiguration(
-        'map',
-        default=os.path.join(
-            get_package_share_directory('turtleterrain'),
-            'map',
-            'map.yaml'))
-
-    param_dir = LaunchConfiguration(
-        'params_file',
-        default=os.path.join(
-            get_package_share_directory('turtleterrain'),
-            'param',
-            'terrain.yaml'))
-
-    nav2_launch_file_dir = os.path.expanduser('~/ros2_packages/install/nav2_bringup/share/nav2_bringup/launch')
-    nav2_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(nav2_launch_file_dir, 'bringup_launch.py')),
-            launch_arguments={
-                'map': map_dir,
-                'use_sim_time': use_sim_time,
-                'params_file': param_dir}.items(),
-        )
+            'y_pose': y_pose}.items())
     
-    # Slam Toolbox
-    declare_slam_params_file_cmd = DeclareLaunchArgument(
-        'slam_params_file',
-        default_value=os.path.join(get_package_share_directory("slam_toolbox"),
-                                   'config', 'mapper_params_online_async.yaml'),
-        description='Full path to the ROS2 parameters file to use for the slam_toolbox node')
+    # amcl pose publisher node
+    amcl_pub = Node(package='turtleterrain', executable='amcl_pose_pub.py')    
 
-    start_async_slam_toolbox_node = Node(
-        parameters=[
-          slam_params_file,
-          {'use_sim_time': use_sim_time}
-        ],
-        package='slam_toolbox',
-        executable='async_slam_toolbox_node',
-        name='slam_toolbox',
-        output='screen')
+    # target pose publisher node
+    target_pub = Node(package='turtleterrain', executable='target_pose_pub.py')    
     
+    # pcd subscriber node
+    pcd_sub = Node(package='turtleterrain', executable='pcd_subscriber_node.py')
+
+
+
     ld = LaunchDescription()
 
     # Add the commands to the launch description
@@ -134,9 +79,9 @@ def generate_launch_description():
     ld.add_action(gzclient_cmd)
     ld.add_action(robot_state_publisher_cmd)
     ld.add_action(spawn_turtlebot_cmd)
-    # ld.add_action(rviz_node)
-    # ld.add_action(nav2_node) 
-    # ld.add_action(declare_slam_params_file_cmd)
-    # ld.add_action(start_async_slam_toolbox_node)
+    ld.add_action(amcl_pub)
+    ld.add_action(target_pub)
+    ld.add_action(pcd_sub)
+
 
     return ld
