@@ -1,39 +1,27 @@
 #!/usr/bin/env python3
 import sys
 import os
-
+import numpy as np
 import rclpy 
 from rclpy.node import Node
 import sensor_msgs.msg as sensor_msgs
 from std_msgs.msg import Float64MultiArray, MultiArrayDimension
-
-import numpy as np
 
 class PCDListener(Node):
 
     def __init__(self):
         super().__init__('pcd_subscriber_node')
 
-        ## This is for visualization of the received point cloud.
-        # self.vis = o3d.visualization.Visualizer()
-        # self.vis.create_window()
-        # self.o3d_pcd = o3d.geometry.PointCloud()
-
-
-        # Set up a subscription to the 'pcd' topic with a callback to the 
-        # function `listener_callback`
         self.pcd_subscriber = self.create_subscription(
-            sensor_msgs.PointCloud2,    # Msg type
-            'cloud_in',                      # topic
-            self.listener_callback,      # Function to call
-            10                          # QoS
-        )
+            sensor_msgs.PointCloud2,    
+            'cloud_in',                   
+            self.listener_callback,      
+            10)
 
         self.pcd_publisher = self.create_publisher(
             Float64MultiArray,
             'xyz_pointcloud',
-            10
-        )
+            10)
 
     def listener_callback(self, msg):
         # Here we convert the 'msg', which is of the type PointCloud2.

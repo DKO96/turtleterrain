@@ -147,7 +147,7 @@
             <vertical>
                 <samples>256</samples>
                 <resolution>1</resolution>
-                <min_angle>-0.523599</min_angle>
+                <min_angle>-0.785398</min_angle>
                 <max_angle>-0.085</max_angle>
               </vertical>
           </scan>

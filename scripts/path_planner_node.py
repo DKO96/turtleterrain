@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import rclpy
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 from rclpy.node import Node 
 from std_msgs.msg import Float64MultiArray, MultiArrayDimension
@@ -14,9 +16,10 @@ class O3DNode(Node):
         super().__init__('open3d_node')
         self.target_pose = None
         self.amcl_pose = None
-        self.odom_pose = None
-        self.current_pose = None
-        
+        self.current_position = None
+        self.current_orientation = None
+        self.wp_published = False
+
         # subscription for pointcloud
         self.pcd_subscription = self.create_subscription(
             Float64MultiArray,
@@ -29,11 +32,6 @@ class O3DNode(Node):
             PoseWithCovarianceStamped,
             'amcl_position',
             self.amcl_pose_callback,
-            10)
-        self.odom_subscription = self.create_subscription(
-            Odometry,
-            'odom',
-            self.odom_pose_callback,
             10)
         
         # subscription for goal location from target_point topic
@@ -57,20 +55,37 @@ class O3DNode(Node):
     def amcl_pose_callback(self, msg):
         self.amcl_pose = np.array([msg.pose.pose.position.x,
                                    msg.pose.pose.position.y,
-                                   msg.pose.pose.position.z])
-        self.update_current_pose()
-    
-    def odom_pose_callback(self, msg):
-        self.odom_pose = np.array([msg.pose.pose.position.x,
-                                   msg.pose.pose.position.y,
-                                   msg.pose.pose.position.z])
+                                   msg.pose.pose.position.z,
+                                   msg.pose.pose.orientation.x,
+                                   msg.pose.pose.orientation.y,
+                                   msg.pose.pose.orientation.z,
+                                   msg.pose.pose.orientation.w])
         self.update_current_pose()
 
     def update_current_pose(self):
-        if self.amcl_pose is not None and self.odom_pose is not None:
-            self.current_pose = (self.amcl_pose + self.odom_pose) / 2
-        else:
-            self.current_pose = self.odom_pose
+        self.get_logger().info(f'amcl pose: {self.amcl_pose}')
+        Q = self.amcl_pose[-4:] / np.linalg.norm(self.amcl_pose[-4:])       
+
+        r00 = 2 * (Q[0] * Q[0] + Q[1] * Q[1]) - 1
+        r01 = 2 * (Q[1] * Q[2] - Q[0] * Q[3])  
+        r02 = 2 * (Q[1] * Q[3] + Q[0] * Q[2]) 
+
+        r10 = 2 * (Q[1] * Q[2] + Q[0] * Q[3]) 
+        r11 = 2 * (Q[0] * Q[0] + Q[2] * Q[2]) - 1 
+        r12 = 2 * (Q[2] * Q[3] - Q[0] * Q[1]) 
+
+        r20 = 2 * (Q[1] * Q[3] - Q[0] * Q[2]) 
+        r21 = 2 * (Q[2] * Q[3] + Q[0] * Q[1])   
+        r22 = 2 * (Q[0] * Q[0] + Q[3] * Q[3]) - 1
+
+        self.current_orientation = np.array([[r00, r01, r02],
+                                             [r10, r11, r12],
+                                             [r20, r21, r22]])
+        self.current_position = np.array(self.amcl_pose[:3])
+        
+        self.get_logger().info(f'current position: {self.current_position}')
+        self.get_logger().info(f'current orientation: {self.current_orientation}')
+
 
     def listener_callback(self, msg):
         num_waypoints = msg.shape[0]
@@ -84,6 +99,9 @@ class O3DNode(Node):
         waypoint_msg.data = msg.flatten().tolist()
 
         self.waypoint_publisher.publish(waypoint_msg)
+        # self.wp_published = True
+        # rclpy.shutdown()
+
 
     def reshape_pcd(self, msg):
         points_dim = msg.layout.dim[0].size
@@ -92,13 +110,18 @@ class O3DNode(Node):
         return pc_array
 
     def waypoint_generator(self, msg):
-        if self.target_pose is None or self.current_pose is None:
+        if self.target_pose is None or self.current_position is None:
             self.get_logger().info('Waiting for target_pose and current_pose to be available.')
             return
 
+        self.get_logger().info(f'target_pose: {self.target_pose}, current_pose: {self.current_position}')
+
         pcd_array = self.reshape_pcd(msg)
-        pcd, nearest_point = ProcessCloud(pcd_array, self.target_pose)
-        waypoints = PathPlanner(pcd, self.current_pose, nearest_point)
+        pcd, nearest_point = ProcessCloud(pcd_array, self.current_position, self.current_orientation, self.target_pose)
+
+        self.get_logger().info(f'nearest_point: {nearest_point}')
+
+        waypoints = PathPlanner(pcd, self.current_position, nearest_point)
         self.get_logger().info(f'waypoints: \n{waypoints}')
         self.listener_callback(waypoints)
 
@@ -107,7 +130,6 @@ def main(args=None):
     rclpy.init(args=args)
     open3d_node = O3DNode()
     rclpy.spin(open3d_node)
-
     open3d_node.destroy_node()
     rclpy.shutdown()
 

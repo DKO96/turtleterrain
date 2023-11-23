@@ -142,6 +142,8 @@ def PathPlanner(points, start, end):
     end_time = time.time()
     # print(f'Execution time: {end_time - start_time}')
 
+    # return path
+
     num_points = 10
     waypoints = cubicSplineSmoother(path, num_points)
 
