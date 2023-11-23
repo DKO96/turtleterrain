@@ -27,12 +27,15 @@ def filter_cloud(boundary_pt, inlier_pts, desired_dist, batch_size=2000):
     return update_inlier
 
 def transform_cloud(pointcloud, translation, rotation):
-    print(f'translation: {translation}')
-    print(f'rotation: {rotation}')
+    transform = np.eye(4)
+    transform[:3,:3] = rotation
+    transform[:3, 3] = translation
+    transform_tensor = torch.from_numpy(transform).float().to("cuda:0")
 
-
-
-
+    n = pointcloud.shape[0]
+    points = torch.hstack((pointcloud, torch.ones(n,1, device="cuda:0"))).T
+    transformed_points = torch.matmul(transform_tensor, points)[:3].T
+    return transformed_points
 
 def nearest_search(filtered_inlier_cloud, target_point):
     pcd_tree = o3d.geometry.KDTreeFlann(filtered_inlier_cloud)
@@ -68,10 +71,10 @@ def ProcessCloud(np_pcd, robot_position, robot_orientation, target_coord):
     transformed_cloud = transform_cloud(filtered_inlier_cloud, robot_position, robot_orientation)
 
     # find nearest point to target
-    np_inlier_cloud = filtered_inlier_cloud.cpu().numpy()
-    filtered_inlier_cloud = o3d.geometry.PointCloud()
-    filtered_inlier_cloud.points = o3d.utility.Vector3dVector(np_inlier_cloud)
+    np_inlier_cloud = transformed_cloud.cpu().numpy()
+    transformed_cloud = o3d.geometry.PointCloud()
+    transformed_cloud.points = o3d.utility.Vector3dVector(np_inlier_cloud)
 
-    nearest_point = nearest_search(filtered_inlier_cloud, target_coord)
+    nearest_point = nearest_search(transformed_cloud, target_coord)
 
     return np_inlier_cloud, nearest_point

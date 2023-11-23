@@ -63,7 +63,6 @@ class O3DNode(Node):
         self.update_current_pose()
 
     def update_current_pose(self):
-        self.get_logger().info(f'amcl pose: {self.amcl_pose}')
         Q = self.amcl_pose[-4:] / np.linalg.norm(self.amcl_pose[-4:])       
 
         r00 = 2 * (Q[0] * Q[0] + Q[1] * Q[1]) - 1
@@ -83,10 +82,6 @@ class O3DNode(Node):
                                              [r20, r21, r22]])
         self.current_position = np.array(self.amcl_pose[:3])
         
-        self.get_logger().info(f'current position: {self.current_position}')
-        self.get_logger().info(f'current orientation: {self.current_orientation}')
-
-
     def listener_callback(self, msg):
         num_waypoints = msg.shape[0]
         num_coords = msg.shape[1]
@@ -114,7 +109,7 @@ class O3DNode(Node):
             self.get_logger().info('Waiting for target_pose and current_pose to be available.')
             return
 
-        self.get_logger().info(f'target_pose: {self.target_pose}, current_pose: {self.current_position}')
+        # self.get_logger().info(f'target_pose: {self.target_pose}, current_pose: {self.current_position}')
 
         pcd_array = self.reshape_pcd(msg)
         pcd, nearest_point = ProcessCloud(pcd_array, self.current_position, self.current_orientation, self.target_pose)
