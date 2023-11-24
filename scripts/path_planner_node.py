@@ -14,6 +14,7 @@ from cloud_processing import ProcessCloud
 class O3DNode(Node):
     def __init__(self):
         super().__init__('open3d_node')
+        self.goal_reached = False
         self.target_pose = None
         self.amcl_pose = None
         self.current_position = None
@@ -80,8 +81,8 @@ class O3DNode(Node):
         r21 = 2*y*z + 2*x*w
         r22 = 1 - 2*x*x - 2*y*y
 
-        self.current_orientation = np.array([[r00, r01, r02],
-                                             [r10, r11, r12],
+        self.current_orientation = np.array([[-r00, -r01, r02],
+                                             [-r10, -r11, r12],
                                              [r20, r21, r22]])
         self.current_position = np.array(self.amcl_pose[:3])
         
@@ -112,8 +113,8 @@ class O3DNode(Node):
 
         if self.wp_counter % self.wp_interval == 0:
             # self.get_logger().info(f'target_pose: {self.target_pose}, current_pose: {self.current_position}')
-            # self.get_logger().info(f'current position: \n{self.current_position}')
-            # self.get_logger().info(f'current orientation: \n{self.current_orientation}')
+            self.get_logger().info(f'current position: \n{self.current_position}')
+            self.get_logger().info(f'current orientation: \n{self.current_orientation}')
 
             pcd_array = self.reshape_pcd(msg)
             pcd, nearest_point = ProcessCloud(pcd_array, self.current_position, self.current_orientation, self.target_pose)

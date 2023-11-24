@@ -47,21 +47,17 @@ class PathFollower(Node):
         print('New waypoints received')
         self.path_received = True
 
-        if not self.navigator.isTaskComplete():
-            self.navigator.cancelTask()
-        
-
         path_coord = self.reshape_path(msg)
         path = self.create_path(path_coord)
 
         self.follow_path(path)
     
     def follow_path(self, path):
-        self.path_received = False
         # smoothed_path = self.navigator.smoothPath(path)
         # self.navigator.followPath(smoothed_path)
         self.navigator.followPath(path)
-        
+        self.navigator.cancelTask()
+
         i = 0
         while not self.navigator.isTaskComplete():
             i += 1

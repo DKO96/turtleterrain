@@ -50,9 +50,13 @@ def ProcessCloud(np_pcd, robot_position, robot_orientation, target_coord):
     tensor_pcd = o3d.t.geometry.PointCloud.from_legacy(pcd.to_legacy())
     pcd_gpu = tensor_pcd.to(device=o3d.core.Device("cuda:0"))
 
+    o3d.visualization.draw_geometries([pcd_gpu.to_legacy()])
+
     # point cloud pre-processing    
     downpcd = pcd_gpu.voxel_down_sample(voxel_size=0.025)
     downpcd.estimate_normals(max_nn=30, radius=0.1)
+
+    o3d.visualization.draw_geometries([downpcd.to_legacy()])
 
     # fit plane
     inlier_cloud, boundary_cloud = fitPlane(downpcd)
@@ -83,17 +87,18 @@ def ProcessCloud(np_pcd, robot_position, robot_orientation, target_coord):
 
 if __name__ == "__main__":
     file_path = os.path.expanduser('~/Documents/Turtleterrain/src/turtleterrain/open3d/Images/')
-    np_pcd = np.loadtxt(file_path + 'flat_pothole_start.xyz')
+    np_pcd = np.loadtxt(file_path + 'flat_pothole_1.xyz')
 
-    robot_position = np.array([0.00699, -0.03745, 0.0])
-    xx = 0.0
+    robot_position = np.array([0.0, 0.0, 0.0])
+    xx = 1.0
     xy = 0.0
     robot_orientation = np.array([[xx, xy, 0], [-xy, xx, 0], [0, 0, 1]])
+    print(f'robot orientation: \n{robot_orientation}')
     robot = o3d.geometry.PointCloud()
     robot.points = o3d.utility.Vector3dVector([robot_position])
     robot.paint_uniform_color([0, 0, 1])
 
-    target_position = np.array([1.0, 5.0, 0.0])
+    target_position = np.array([0.5, 4.0, 0.0])
     
     plane_cloud, output_cloud, nearest_point = ProcessCloud(np_pcd, robot_position, robot_orientation, target_position)
 
@@ -115,6 +120,7 @@ if __name__ == "__main__":
     nearest_point_pcd.paint_uniform_color([0, 1, 0])
     
     o3d.io.write_point_cloud(file_path + 'processed_pcd_start.xyz', output_cloud_pcd)
+    print(f'start point: {robot_position}')
     print(f'nearest point: {nearest_point}')
     o3d.visualization.draw_geometries([transformed_cloud, output_cloud_pcd, robot, nearest_point_pcd])
 

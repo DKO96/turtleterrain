@@ -152,10 +152,10 @@ def main():
     # points[-1] = np.array([2000,2000,2000])
 
     file_path = os.path.expanduser('~/Documents/Turtleterrain/src/turtleterrain/open3d/Images/')
-    points = np.loadtxt(file_path + 'processed_pcd_3.xyz')
+    points = np.loadtxt(file_path + 'processed_pcd_start.xyz')
     
-    start = np.array([0.28369, 0.49533, 0.0])
-    end = np.array([0.33822, 2.97588, -0.225])
+    start = np.array([0.0, 0.0, 0.0])
+    end = np.array([ 0.29968545,  2.66602373, -0.2 ])
     points = np.append(points, [start], axis=0)
     points = np.append(points, [end], axis=0)
 
