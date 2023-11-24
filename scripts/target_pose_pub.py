@@ -27,7 +27,7 @@ class TargetPublisher(Node):
 
         # postion and direction of pose
         msg.pose.position.x = 1.0
-        msg.pose.position.y = 5.0
+        msg.pose.position.y = -2.0
         msg.pose.position.z = 0.0
         # msg.pose.orientation.x = 0.0
         # msg.pose.orientation.y = 0.0

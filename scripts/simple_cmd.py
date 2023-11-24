@@ -2,10 +2,12 @@
 import rclpy
 import numpy as np
 from rclpy.node import Node
+from rclpy.action import ActionClient
 from std_msgs.msg import Float64MultiArray, String
 from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Path
 from robot_navigator import BasicNavigator, TaskResult
+from nav2_msgs.action import NavigateToPose
 
 class PathFollower(Node):
     def __init__(self, navigator):
@@ -16,10 +18,10 @@ class PathFollower(Node):
             'waypoint_publisher',
             self.waypoint_callback,
             10)
-        
-        self.path_state = self.create_publisher(String, 'task_state', 10)
-        self.path_viewer = self.create_publisher(Path, 'planned_path', 10)
 
+        self.nav_action_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')        
+        self.path_received = False
+        self.navigating = False
 
     def reshape_path(self, msg):
         num_waypoints = msg.layout.dim[0].size
@@ -42,18 +44,24 @@ class PathFollower(Node):
         return path
 
     def waypoint_callback(self, msg):
+        print('New waypoints received')
+        self.path_received = True
+
+        if not self.navigator.isTaskComplete():
+            self.navigator.cancelTask()
+        
+
         path_coord = self.reshape_path(msg)
         path = self.create_path(path_coord)
-
-        self.path_viewer.publish(path)        
 
         self.follow_path(path)
     
     def follow_path(self, path):
+        self.path_received = False
         # smoothed_path = self.navigator.smoothPath(path)
         # self.navigator.followPath(smoothed_path)
         self.navigator.followPath(path)
-
+        
         i = 0
         while not self.navigator.isTaskComplete():
             i += 1
