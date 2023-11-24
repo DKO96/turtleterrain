@@ -64,18 +64,31 @@ class O3DNode(Node):
 
     def update_current_pose(self):
         Q = self.amcl_pose[-4:] / np.linalg.norm(self.amcl_pose[-4:])       
+        x, y, z, w = Q[0], Q[1], Q[2], Q[3]
 
-        r00 = 2 * (Q[0] * Q[0] + Q[1] * Q[1]) - 1
-        r01 = 2 * (Q[1] * Q[2] - Q[0] * Q[3])  
-        r02 = 2 * (Q[1] * Q[3] + Q[0] * Q[2]) 
 
-        r10 = 2 * (Q[1] * Q[2] + Q[0] * Q[3]) 
-        r11 = 2 * (Q[0] * Q[0] + Q[2] * Q[2]) - 1 
-        r12 = 2 * (Q[2] * Q[3] - Q[0] * Q[1]) 
+        # r00 = 2 * (Q[0] * Q[0] + Q[1] * Q[1]) - 1
+        # r01 = 2 * (Q[1] * Q[2] - Q[0] * Q[3])  
+        # r02 = 2 * (Q[1] * Q[3] + Q[0] * Q[2]) 
+        # r10 = 2 * (Q[1] * Q[2] + Q[0] * Q[3]) 
+        # r11 = 2 * (Q[0] * Q[0] + Q[2] * Q[2]) - 1 
+        # r12 = 2 * (Q[2] * Q[3] - Q[0] * Q[1]) 
+        # r20 = 2 * (Q[1] * Q[3] - Q[0] * Q[2]) 
+        # r21 = 2 * (Q[2] * Q[3] + Q[0] * Q[1])   
+        # r22 = 2 * (Q[0] * Q[0] + Q[3] * Q[3]) - 1
 
-        r20 = 2 * (Q[1] * Q[3] - Q[0] * Q[2]) 
-        r21 = 2 * (Q[2] * Q[3] + Q[0] * Q[1])   
-        r22 = 2 * (Q[0] * Q[0] + Q[3] * Q[3]) - 1
+        r00 = 1 - 2*y*y - 2*z*z
+        r01 = 2*x*y - 2*z*w
+        r02 = 2*x*z + 2*y*w
+
+        r10 = 2*x*y + 2*z*w
+        r11 = 1 - 2*x*x - 2*z*z
+        r12 = 2*y*z - 2*x*w
+
+        r20 = 2*x*z - 2*y*w
+        r21 = 2*y*z + 2*x*w
+        r22 = 1 - 2*x*x - 2*y*y
+
 
         self.current_orientation = np.array([[r00, r01, r02],
                                              [r10, r11, r12],
@@ -94,8 +107,8 @@ class O3DNode(Node):
         waypoint_msg.data = msg.flatten().tolist()
 
         self.waypoint_publisher.publish(waypoint_msg)
-        # self.wp_published = True
-        # rclpy.shutdown()
+        self.wp_published = True
+        rclpy.shutdown()
 
 
     def reshape_pcd(self, msg):
@@ -110,6 +123,9 @@ class O3DNode(Node):
             return
 
         # self.get_logger().info(f'target_pose: {self.target_pose}, current_pose: {self.current_position}')
+        # self.get_logger().info(f'current position: \n{self.current_position}')
+        # self.get_logger().info(f'current orientation: \n{self.current_orientation}')
+
 
         pcd_array = self.reshape_pcd(msg)
         pcd, nearest_point = ProcessCloud(pcd_array, self.current_position, self.current_orientation, self.target_pose)

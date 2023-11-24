@@ -1,3 +1,4 @@
+import os
 import time
 import numpy as np
 import matplotlib.pyplot as plt
@@ -150,11 +151,13 @@ def main():
     # points[0] = np.array([0,0,0])
     # points[-1] = np.array([2000,2000,2000])
 
-    points = np.loadtxt('surface_points_tensor.xyz')
-    print(f'# of points: {len(points)}')
-
-    start = points[0] 
-    end = points[-1]
+    file_path = os.path.expanduser('~/Documents/Turtleterrain/src/turtleterrain/open3d/Images/')
+    points = np.loadtxt(file_path + 'processed_pcd_1.xyz')
+    
+    start = np.array([0.28369, 0.49533, 0.0])
+    end = np.array([0.33822, 2.97588, -0.225])
+    points = np.append(points, [start], axis=0)
+    points = np.append(points, [end], axis=0)
 
     start_time = time.time()
     nn = NearestNeighbors(n_neighbors=45, algorithm='ball_tree').fit(points) 
@@ -166,27 +169,27 @@ def main():
     num = 8
     waypoints = cubicSplineSmoother(path, num)
 
-    # if path:
-    #     # Converting the path into a format suitable for plotting
-    #     path_points = np.array(path)
+    if path:
+        # Converting the path into a format suitable for plotting
+        path_points = np.array(path)
     
-    #     fig = plt.figure(figsize=(9, 9))
-    #     ax = fig.add_subplot(111, projection='3d')
+        fig = plt.figure(figsize=(9, 9))
+        ax = fig.add_subplot(111, projection='3d')
         
-    #     # Scatter plot for the points
-    #     # ax.scatter(points[:, 0], points[:, 1], points[:, 2], color='blue', marker='o', label='Point Cloud')
+        # Scatter plot for the points
+        ax.scatter(points[:, 0], points[:, 1], points[:, 2], color='blue', marker='o', label='Point Cloud')
     
-    #     # Line plot for the path
-    #     ax.plot(path_points[:, 0], path_points[:, 1], path_points[:, 2], color='red', linewidth=2, label='Path')
-    #     ax.plot(waypoints[:, 0], waypoints[:, 1], waypoints[:, 2], color='green', linewidth=2, label='Cubic Path')
+        # Line plot for the path
+        ax.plot(path_points[:, 0], path_points[:, 1], path_points[:, 2], color='red', linewidth=2, label='Path')
+        ax.plot(waypoints[:, 0], waypoints[:, 1], waypoints[:, 2], color='green', linewidth=2, label='Cubic Path')
     
-    #     ax.set_title("3D A* Pathfinding")
-    #     ax.set_xlabel("X-axis")
-    #     ax.set_ylabel("Y-axis")
-    #     ax.set_zlabel("Z-axis")
-    #     ax.legend()
-    #     ax.grid(True)
-    #     plt.show()
+        ax.set_title("3D A* Pathfinding")
+        ax.set_xlabel("X-axis")
+        ax.set_ylabel("Y-axis")
+        ax.set_zlabel("Z-axis")
+        ax.legend()
+        ax.grid(True)
+        plt.show()
 
 
 
