@@ -52,7 +52,7 @@ def ProcessCloud(np_pcd, robot_position, robot_orientation, target_coord):
     # o3d.visualization.draw_geometries([pcd_gpu.to_legacy()])
 
     # point cloud pre-processing    
-    downpcd = pcd_gpu.voxel_down_sample(voxel_size=0.01)
+    downpcd = pcd_gpu.voxel_down_sample(voxel_size=0.02)
     downpcd.estimate_normals(max_nn=30, radius=0.1)
 
     # o3d.visualization.draw_geometries([downpcd.to_legacy()])
@@ -68,7 +68,7 @@ def ProcessCloud(np_pcd, robot_position, robot_orientation, target_coord):
 
     filtered_bound = torch.ones(inlier_tensor.shape[0], dtype=torch.bool, device='cuda:0')
     for boundary_pt in boundary_tensor:
-        filtered_bound = torch.logical_and(filtered_bound, filter_cloud(boundary_pt, inlier_tensor, 0.1))
+        filtered_bound = torch.logical_and(filtered_bound, filter_cloud(boundary_pt, inlier_tensor, 0.3))
     filtered_inlier_cloud = inlier_tensor[filtered_bound]
 
     # transfrom pcd to map frame

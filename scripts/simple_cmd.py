@@ -4,7 +4,7 @@ import numpy as np
 from rclpy.node import Node
 from rclpy.action import ActionClient
 from std_msgs.msg import Float64MultiArray, String
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
 from nav_msgs.msg import Path
 from robot_navigator import BasicNavigator, TaskResult
 from nav2_msgs.action import NavigateToPose
@@ -13,6 +13,7 @@ class PathFollower(Node):
     def __init__(self, navigator):
         super().__init__('path_follower_node')
         self.navigator = navigator
+        self.new_waypoints = None
         self.waypoint_subscriber = self.create_subscription(
             Float64MultiArray,
             'waypoint_publisher',
@@ -20,8 +21,19 @@ class PathFollower(Node):
             10)
 
         self.nav_action_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')        
-        self.path_received = False
-        self.navigating = False
+
+    def amcl_pose_callback(self,msg):
+        self.amcl_pose = np.array([msg.pose.pose.position.x,
+                                   msg.pose.pose.position.y,
+                                   msg.pose.pose.position.z])
+    
+    def target_pose_callback(self,msg):
+        self.target_pose = np.array([msg.pose.position.x,
+                                     msg.pose.position.y,
+                                     msg.pose.position.z])
+
+    def distance_to_target(self):
+        return np.linalg.norm(self.target_pose - self.amcl_pose)
 
     def reshape_path(self, msg):
         num_waypoints = msg.layout.dim[0].size
@@ -44,42 +56,37 @@ class PathFollower(Node):
         return path
 
     def waypoint_callback(self, msg):
-        print('New waypoints received')
-        self.path_received = True
-
+        self.navigator.cancelTask()
         path_coord = self.reshape_path(msg)
         path = self.create_path(path_coord)
-
         self.follow_path(path)
-    
+
     def follow_path(self, path):
-        # smoothed_path = self.navigator.smoothPath(path)
-        # self.navigator.followPath(smoothed_path)
-        self.navigator.followPath(path)
-        self.navigator.cancelTask()
+        smoothed_path = self.navigator.smoothPath(path)
+        self.navigator.followPath(smoothed_path)
 
-        i = 0
-        while not self.navigator.isTaskComplete():
-            i += 1
-            feedback = self.navigator.getFeedback()
-            if feedback and i % 5 == 0:
-                print(
-                    'Estimated distance remaining to goal position: '
-                    + '{0:.3f}'.format(feedback.distance_to_goal)
-                    + '\nCurrent speed of the robot: '
-                    + '{0:.3f}'.format(feedback.speed)
-                )
+    #     i = 0
+    #     while not self.navigator.isTaskComplete():
+    #         i += 1
+    #         feedback = self.navigator.getFeedback()
+    #         if feedback and i % 5 == 0:
+    #             print(
+    #                 'Estimated distance remaining to goal position: '
+    #                 + '{0:.3f}'.format(feedback.distance_to_goal)
+    #                 + '\nCurrent speed of the robot: '
+    #                 + '{0:.3f}'.format(feedback.speed)
+    #             )
 
-        result = self.navigator.getResult()
-        if result == TaskResult.SUCCEEDED:
-            print('Goal succeeded!')
-            self.flag = True
-        elif result == TaskResult.CANCELED:
-            print('Goal was canceled!')
-        elif result == TaskResult.FAILED:
-            print('Goal failed!')
-        else:
-            print('Goal has an invalid return status!')
+        # result = self.navigator.getResult()
+        # if result == TaskResult.SUCCEEDED:
+        #     print('Goal succeeded!')
+        #     self.flag = True
+        # elif result == TaskResult.CANCELED:
+        #     print('Goal was canceled!')
+        # elif result == TaskResult.FAILED:
+        #     print('Goal failed!')
+        # else:
+        #     print('Goal has an invalid return status!')
 
 
 def main():

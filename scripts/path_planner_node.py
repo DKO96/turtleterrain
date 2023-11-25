@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import rclpy
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 
 from rclpy.node import Node 
 from std_msgs.msg import Float64MultiArray, MultiArrayDimension
@@ -13,31 +11,30 @@ from cloud_processing import ProcessCloud
 
 class O3DNode(Node):
     def __init__(self):
-        super().__init__('open3d_node')
+        super().__init__('path_planning_node')
         self.goal_reached = False
         self.target_pose = None
         self.amcl_pose = None
+        self.prev_waypoint_goal = None
         self.current_position = None
         self.current_orientation = None
-        self.wp_counter = 0
-        self.wp_interval = 20
 
         # subscription for pointcloud
-        self.pcd_subscription = self.create_subscription(
+        self.pcd_subscriber = self.create_subscription(
             Float64MultiArray,
             'xyz_pointcloud',
-            self.waypoint_generator,
+            self.get_waypoints,
             10)
 
         # subscription for current pose from amcl_pose and odom
-        self.amcl_subscription = self.create_subscription(
+        self.amcl_subscriber = self.create_subscription(
             PoseWithCovarianceStamped,
             'amcl_position',
             self.amcl_pose_callback,
             10)
         
         # subscription for goal location from target_point topic
-        self.target_subscription = self.create_subscription(
+        self.target_subscriber = self.create_subscription(
             PoseStamped,
             'target_pose',
             self.target_callback,
@@ -106,24 +103,31 @@ class O3DNode(Node):
         return pc_array
 
     def waypoint_generator(self, msg):
-        self.wp_counter += 1
+        pcd_array = self.reshape_pcd(msg)
+        pcd, nearest_point = ProcessCloud(pcd_array, self.current_position, self.current_orientation, self.target_pose)
+        waypoints = PathPlanner(pcd, self.current_position, nearest_point)
+        print(f'generated waypoints: {waypoints}')
+        self.publish_waypoints(waypoints)    
+        self.prev_waypoint_goal = nearest_point
+    
+    def distance_to_waypoint_end(self):
+        if self.prev_waypoint_goal is not None and self.current_position is not None: 
+            return np.linalg.norm(self.prev_waypoint_goal - self.current_position)
+
+    def distance_to_target(self):
+        return(np.linalg.norm(self.current_position - self.target_pose))
+
+    def get_waypoints(self, msg):
         if self.target_pose is None or self.current_position is None:
             self.get_logger().info('Waiting for target_pose and current_pose to be available.')
             return
 
-        if self.wp_counter % self.wp_interval == 0:
-            # self.get_logger().info(f'target_pose: {self.target_pose}, current_pose: {self.current_position}')
-            self.get_logger().info(f'current position: \n{self.current_position}')
-            self.get_logger().info(f'current orientation: \n{self.current_orientation}')
-
-            pcd_array = self.reshape_pcd(msg)
-            pcd, nearest_point = ProcessCloud(pcd_array, self.current_position, self.current_orientation, self.target_pose)
-
-            self.get_logger().info(f'nearest_point: {nearest_point}')
-
-            waypoints = PathPlanner(pcd, self.current_position, nearest_point)
-            self.get_logger().info(f'waypoints: \n{waypoints}')
-            self.publish_waypoints(waypoints)
+        if self.distance_to_target() < 0.1:
+            print('Target location reached')
+            rclpy.shutdown()
+              
+        if self.prev_waypoint_goal is None or self.distance_to_waypoint_end() < 1.25:
+            self.waypoint_generator(msg)
 
 
 def main(args=None):
@@ -136,4 +140,3 @@ def main(args=None):
 
 if __name__ == "__main__":
     main()
-
