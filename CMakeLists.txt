@@ -87,11 +87,8 @@ install(PROGRAMS
   scripts/target_pose_pub.py
   scripts/amcl_pose_pub.py
   scripts/pcd_subscriber_node.py
-  scripts/path_follower_node.py
-  scripts/action_waypoint_follower_node.py
   scripts/path_planner_node.py
   scripts/simple_cmd.py
-
 
   scripts/path_planning.py
   scripts/cloud_processing.py
