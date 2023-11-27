@@ -6,7 +6,7 @@ import numpy as np
 import open3d as o3d
 
 def fitPlane(downpcd):
-    plane_model, inliers = downpcd.segment_plane(distance_threshold=0.05,
+    plane_model, inliers = downpcd.segment_plane(distance_threshold=0.03,
                                             ransac_n=3,
                                             num_iterations=1000,
                                             probability=0.9999)
@@ -87,12 +87,12 @@ def ProcessCloud(np_pcd, robot_position, robot_orientation, target_coord):
 
 if __name__ == "__main__":
     file_path = os.path.expanduser('~/Documents/Turtleterrain/src/turtleterrain/open3d/Images/')
-    np_pcd = np.loadtxt(file_path + 'flat_pothole_1.xyz')
+    np_pcd = np.loadtxt(file_path + 'steps_1.xyz')
 
     robot_position = np.array([0.0, 0.0, 0.0])
     xx = 1.0
     xy = 0.0
-    robot_orientation = np.array([[xx, xy, 0], [-xy, xx, 0], [0, 0, 1]])
+    robot_orientation = np.array([[-xx, -xy, 0], [-xy, -xx, 0], [0, 0, 1]])
     print(f'robot orientation: \n{robot_orientation}')
     robot = o3d.geometry.PointCloud()
     robot.points = o3d.utility.Vector3dVector([robot_position])
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     nearest_point_pcd.points = o3d.utility.Vector3dVector([nearest_point])
     nearest_point_pcd.paint_uniform_color([0, 1, 0])
     
-    o3d.io.write_point_cloud(file_path + 'processed_pcd_start.xyz', output_cloud_pcd)
+    o3d.io.write_point_cloud(file_path + 'processed_steps_1.xyz', output_cloud_pcd)
     print(f'start point: {robot_position}')
     print(f'nearest point: {nearest_point}')
     o3d.visualization.draw_geometries([transformed_cloud, output_cloud_pcd, robot, nearest_point_pcd])

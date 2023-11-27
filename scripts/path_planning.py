@@ -135,12 +135,16 @@ def cubicSplineSmoother(path, num_points):
         spline_y(t_reduced),
         spline_z(t_reduced)
     ))
-    return waypoints
+    return waypoints[1:]
 
-def PathPlanner(points, start, end):
+def PathPlanner(points, start, end, target):
     nn = NearestNeighbors(n_neighbors=100, algorithm='kd_tree').fit(points) 
     path = bidirectional_a_star(start, end, nn, points)
 
+    print(f'path: {path}')
+
+    num_points = 20
+    waypoints = cubicSplineSmoother(path, num_points)
 
     # Visualization
     robot = o3d.geometry.PointCloud()
@@ -156,20 +160,23 @@ def PathPlanner(points, start, end):
     nearest_point_pcd.paint_uniform_color([0, 1, 0])
     
     target_pcd = o3d.geometry.PointCloud()
-    target_pcd.points = o3d.utility.Vector3dVector([[1.0, 3.0, 0.0]])
+    target_pcd.points = o3d.utility.Vector3dVector([target])
     target_pcd.paint_uniform_color([1, 0, 1])
 
     path_pcd = o3d.geometry.PointCloud()
     path_pcd.points = o3d.utility.Vector3dVector(path)
     path_pcd.paint_uniform_color([1, 0, 0])
 
-    o3d.visualization.draw_geometries([points_pcd, path_pcd, robot, nearest_point_pcd, target_pcd])
+    waypoints_pcd = o3d.geometry.PointCloud()
+    waypoints_pcd.points = o3d.utility.Vector3dVector(waypoints)
+    waypoints_pcd.paint_uniform_color([1, 0.5, 0])
+    
+    o3d.visualization.draw_geometries([points_pcd, path_pcd, waypoints_pcd, robot, nearest_point_pcd, target_pcd])
 
 
-    # num_points = 10
-    # waypoints = cubicSplineSmoother(path, num_points)
 
-    return np.asarray(path)
+
+    return np.asarray(waypoints)
 
 
 

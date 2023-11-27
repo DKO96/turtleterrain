@@ -5,9 +5,9 @@ import numpy as np
 from rclpy.node import Node 
 from std_msgs.msg import Float64MultiArray, MultiArrayDimension
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
-from nav_msgs.msg import Odometry
 from path_planning import PathPlanner
 from cloud_processing import ProcessCloud
+from robot_pcd import robotPointCloud
 
 class O3DNode(Node):
     def __init__(self):
@@ -105,8 +105,8 @@ class O3DNode(Node):
     def waypoint_generator(self, msg):
         pcd_array = self.reshape_pcd(msg)
         pcd, nearest_point = ProcessCloud(pcd_array, self.current_position, self.current_orientation, self.target_pose)
-        waypoints = PathPlanner(pcd, self.current_position, nearest_point)
-        print(f'generated waypoints: {waypoints}')
+        waypoints = PathPlanner(pcd, self.current_position, nearest_point, self.target_pose)
+        # print(f'generated waypoints: {waypoints}')
         self.publish_waypoints(waypoints)    
         self.prev_waypoint_goal = nearest_point
     
@@ -125,7 +125,10 @@ class O3DNode(Node):
         if self.distance_to_target() < 0.1:
             print('Target location reached')
             rclpy.shutdown()
-              
+
+        # print(f'target: {self.target_pose}')
+        # print(f'curret position: {self.current_position}')
+
         if self.prev_waypoint_goal is None or self.distance_to_waypoint_end() < 1.25:
             self.waypoint_generator(msg)
 

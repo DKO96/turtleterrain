@@ -30,7 +30,7 @@ class O3DNode(Node):
         pc_array = np.array(msg.data).reshape((points_dim, coords_dim))
 
         file_path = os.path.expanduser('~/Documents/Turtleterrain/src/turtleterrain/open3d/Images/')
-        np.savetxt(file_path + 'flat_pothole_1.xyz', pc_array)
+        np.savetxt(file_path + 'steps_1.xyz', pc_array)
         self.get_logger().info(f'xyz format shape: {pc_array}')
         self.get_logger().info('shutting down node')
         self.subscription.destroy()

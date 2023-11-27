@@ -217,7 +217,8 @@
         <always_on>true</always_on>
         <visualize>false</visualize>
         <!-- <pose>-0.032 0 0.171 0 0 0</pose> -->
-        <pose>0 0 0.171 0 0 3.141</pose>
+        <!-- <pose>0 0 0.171 0 0 3.141</pose> -->
+        <pose>0 0 0.671 0 0 3.141</pose>
         <update_rate>5</update_rate>
         <ray>
           <scan>

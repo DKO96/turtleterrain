@@ -62,8 +62,8 @@ class PathFollower(Node):
         self.follow_path(path)
 
     def follow_path(self, path):
-        smoothed_path = self.navigator.smoothPath(path)
-        self.navigator.followPath(smoothed_path)
+        # smoothed_path = self.navigator.smoothPath(path)
+        self.navigator.followPath(path)
 
     #     i = 0
     #     while not self.navigator.isTaskComplete():

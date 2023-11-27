@@ -3,6 +3,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import heapq
+import open3d as o3d
 from sklearn.neighbors import NearestNeighbors
 from scipy.interpolate import CubicSpline
 
@@ -152,7 +153,7 @@ def main():
     # points[-1] = np.array([2000,2000,2000])
 
     file_path = os.path.expanduser('~/Documents/Turtleterrain/src/turtleterrain/open3d/Images/')
-    points = np.loadtxt(file_path + 'processed_pcd_start.xyz')
+    points = np.loadtxt(file_path + 'processed_steps_1.xyz')
     
     start = np.array([0.0, 0.0, 0.0])
     end = np.array([ 0.29968545,  2.66602373, -0.2 ])
@@ -169,27 +170,51 @@ def main():
     num = 8
     waypoints = cubicSplineSmoother(path, num)
 
-    if path:
-        # Converting the path into a format suitable for plotting
-        path_points = np.array(path)
+    # Visualization
+    robot = o3d.geometry.PointCloud()
+    robot.points = o3d.utility.Vector3dVector([start])
+    robot.paint_uniform_color([0, 0, 1])
+
+    points_pcd = o3d.geometry.PointCloud()
+    points_pcd.points = o3d.utility.Vector3dVector(points)
+    points_pcd.paint_uniform_color([0.5, 0.5, 0.5])
+
+    nearest_point_pcd = o3d.geometry.PointCloud()
+    nearest_point_pcd.points = o3d.utility.Vector3dVector([end])    
+    nearest_point_pcd.paint_uniform_color([0, 1, 0])
     
-        fig = plt.figure(figsize=(9, 9))
-        ax = fig.add_subplot(111, projection='3d')
+    target_pcd = o3d.geometry.PointCloud()
+    target_pcd.points = o3d.utility.Vector3dVector([[1.0, 3.0, 0.0]])
+    target_pcd.paint_uniform_color([1, 0, 1])
+
+    path_pcd = o3d.geometry.PointCloud()
+    path_pcd.points = o3d.utility.Vector3dVector(path)
+    path_pcd.paint_uniform_color([1, 0, 0])
+
+    o3d.visualization.draw_geometries([points_pcd, path_pcd, robot, nearest_point_pcd, target_pcd])
+    
+    
+    # if path:
+    #     # Converting the path into a format suitable for plotting
+    #     path_points = np.array(path)
+    
+    #     fig = plt.figure(figsize=(9, 9))
+    #     ax = fig.add_subplot(111, projection='3d')
         
-        # Scatter plot for the points
-        ax.scatter(points[:, 0], points[:, 1], points[:, 2], color='blue', marker='o', label='Point Cloud')
+    #     # Scatter plot for the points
+    #     ax.scatter(points[:, 0], points[:, 1], points[:, 2], color='blue', marker='o', label='Point Cloud')
     
-        # Line plot for the path
-        ax.plot(path_points[:, 0], path_points[:, 1], path_points[:, 2], color='red', linewidth=2, label='Path')
-        ax.plot(waypoints[:, 0], waypoints[:, 1], waypoints[:, 2], color='green', linewidth=2, label='Cubic Path')
+    #     # Line plot for the path
+    #     ax.plot(path_points[:, 0], path_points[:, 1], path_points[:, 2], color='red', linewidth=2, label='Path')
+    #     ax.plot(waypoints[:, 0], waypoints[:, 1], waypoints[:, 2], color='green', linewidth=2, label='Cubic Path')
     
-        ax.set_title("3D A* Pathfinding")
-        ax.set_xlabel("X-axis")
-        ax.set_ylabel("Y-axis")
-        ax.set_zlabel("Z-axis")
-        ax.legend()
-        ax.grid(True)
-        plt.show()
+    #     ax.set_title("3D A* Pathfinding")
+    #     ax.set_xlabel("X-axis")
+    #     ax.set_ylabel("Y-axis")
+    #     ax.set_zlabel("Z-axis")
+    #     ax.legend()
+    #     ax.grid(True)
+    #     plt.show()
 
 
 

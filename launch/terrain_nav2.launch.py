@@ -18,7 +18,8 @@ def generate_launch_description():
             'map',
             # 'map.yaml'))
             # 'empty_map.yaml'))
-            'flat_tree_terrain.yaml'))
+            # 'flat_tree_terrain.yaml'))
+            'final_terrain.yaml'))
 
     param_dir = LaunchConfiguration(
         'params_file',
