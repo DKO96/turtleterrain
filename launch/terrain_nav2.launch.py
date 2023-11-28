@@ -27,6 +27,7 @@ def generate_launch_description():
             get_package_share_directory('turtleterrain'),
             'param',
             'terrain.yaml'))
+            # 'nav2_params.yaml'))
 
     nav2_launch_file_dir = os.path.join(get_package_share_directory('nav2_bringup'), 'launch')
 

@@ -2,9 +2,11 @@
 import numpy as np
 import torch
 
-def robotPointCloud(R=0.15):
+def robotPointCloud(R=0.2):
+    # a, b, c, d = plane_eqn
+
     np.random.seed(42)
-    n = 1000
+    n = 6000
     r = R * np.sqrt(np.random.rand(n))
     theta = np.random.rand(n) * 2 * np.pi
 
@@ -12,7 +14,8 @@ def robotPointCloud(R=0.15):
     # y = robot_coord[1] + r * np.sin(theta) 
     x = r * np.cos(theta) 
     y = r * np.sin(theta) 
-    z = np.ones(n) * -0.161 
+    z = np.random.uniform(low=-0.2, high=-0.161, size=n) 
+    # z = -(a * x + b * y + d) / c
 
     robot_points = np.vstack((x, y, z)).T
     return robot_points

@@ -143,7 +143,7 @@ def PathPlanner(points, start, end, target):
 
     print(f'path: {path}')
 
-    num_points = 20
+    num_points = 30
     waypoints = cubicSplineSmoother(path, num_points)
 
     # Visualization
@@ -171,7 +171,7 @@ def PathPlanner(points, start, end, target):
     waypoints_pcd.points = o3d.utility.Vector3dVector(waypoints)
     waypoints_pcd.paint_uniform_color([1, 0.5, 0])
     
-    o3d.visualization.draw_geometries([points_pcd, path_pcd, waypoints_pcd, robot, nearest_point_pcd, target_pcd])
+    # o3d.visualization.draw_geometries([points_pcd, path_pcd, waypoints_pcd, robot, nearest_point_pcd, target_pcd])
 
 
 

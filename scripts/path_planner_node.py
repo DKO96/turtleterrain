@@ -18,6 +18,7 @@ class O3DNode(Node):
         self.prev_waypoint_goal = None
         self.current_position = None
         self.current_orientation = None
+        self.prev_position = None
 
         # subscription for pointcloud
         self.pcd_subscriber = self.create_subscription(
@@ -113,6 +114,10 @@ class O3DNode(Node):
     def distance_to_waypoint_end(self):
         if self.prev_waypoint_goal is not None and self.current_position is not None: 
             return np.linalg.norm(self.prev_waypoint_goal - self.current_position)
+    
+    def distance_advanced(self):
+        if self.prev_position is not None and self.current_position is not None: 
+            return np.linalg.norm(self.prev_position - self.current_position)
 
     def distance_to_target(self):
         return(np.linalg.norm(self.current_position - self.target_pose))
@@ -129,9 +134,12 @@ class O3DNode(Node):
         # print(f'target: {self.target_pose}')
         # print(f'curret position: {self.current_position}')
 
-        if self.prev_waypoint_goal is None or self.distance_to_waypoint_end() < 1.25:
-            self.waypoint_generator(msg)
+        # if self.prev_waypoint_goal is None or self.distance_to_waypoint_end() < 1.5:
+        #     self.waypoint_generator(msg)
 
+        if self.prev_waypoint_goal is None or self.distance_advanced() > 0.2:
+            self.waypoint_generator(msg)
+            self.prev_position = self.current_position
 
 def main(args=None):
     rclpy.init(args=args)
