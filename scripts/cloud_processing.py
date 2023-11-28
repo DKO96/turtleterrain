@@ -108,7 +108,7 @@ def ProcessCloud(pcd, robot_position, robot_orientation, target_coord):
     
     filtered_bound = torch.ones(inlier_tensor.shape[0], dtype=torch.bool, device='cuda:0')
     for boundary_pt in boundary_tensor_filtered:
-        filtered_bound = torch.logical_and(filtered_bound, filter_cloud(boundary_pt, inlier_tensor, 0.16))
+        filtered_bound = torch.logical_and(filtered_bound, filter_cloud(boundary_pt, inlier_tensor, 0.2))
     filtered_inlier_cloud = inlier_tensor[filtered_bound]
     
     np_filtered = filtered_inlier_cloud.detach().cpu().numpy()

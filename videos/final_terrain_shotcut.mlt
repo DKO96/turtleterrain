@@ -33,6 +33,14 @@
     <property name="shotcut:hash">988cfd19e0c8a1d735a2d9f0798dc61d</property>
     <property name="shotcut:caption">final_terrain_full.mkv (3x)</property>
     <property name="xml">was here</property>
+    <filter id="filter0" in="00:06:01.440" out="00:06:03.296">
+      <property name="rect">270 184 4831 2606 1</property>
+      <property name="circle">0</property>
+      <property name="color">#ff000000</property>
+      <property name="radius">0</property>
+      <property name="mlt_service">qtcrop</property>
+      <property name="shotcut:filter">cropRectangle</property>
+    </filter>
   </producer>
   <producer id="producer1" in="00:00:00.000" out="00:06:33.344">
     <property name="length">00:06:33.360</property>
@@ -51,6 +59,14 @@
     <property name="shotcut:hash">988cfd19e0c8a1d735a2d9f0798dc61d</property>
     <property name="shotcut:caption">final_terrain_full.mkv (3x)</property>
     <property name="xml">was here</property>
+    <filter id="filter1" in="00:06:04.288" out="00:06:31.104">
+      <property name="rect">270 184 4831 2607 1</property>
+      <property name="circle">0</property>
+      <property name="color">#ff000000</property>
+      <property name="radius">0</property>
+      <property name="mlt_service">qtcrop</property>
+      <property name="shotcut:filter">cropRectangle</property>
+    </filter>
   </producer>
   <playlist id="playlist0">
     <property name="shotcut:video">1</property>

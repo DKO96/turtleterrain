@@ -1,0 +1,153 @@
+<?xml version="1.0" standalone="no"?>
+<mlt LC_NUMERIC="C" version="7.4.0" title="Shotcut version 22.01.30" producer="main_bin">
+  <profile description="automatic" width="5120" height="2880" progressive="1" sample_aspect_num="1" sample_aspect_den="1" display_aspect_num="16" display_aspect_den="9" frame_rate_num="125" frame_rate_den="2" colorspace="709"/>
+  <playlist id="main_bin">
+    <property name="xml_retain">1</property>
+  </playlist>
+  <producer id="black" in="00:00:00.000" out="00:00:23.104">
+    <property name="length">00:00:23.120</property>
+    <property name="eof">pause</property>
+    <property name="resource">0</property>
+    <property name="aspect_ratio">1</property>
+    <property name="mlt_service">color</property>
+    <property name="mlt_image_format">rgba</property>
+    <property name="set.test_audio">0</property>
+  </producer>
+  <playlist id="background">
+    <entry producer="black" in="00:00:00.000" out="00:00:23.104"/>
+  </playlist>
+  <producer id="producer0" in="00:00:00.000" out="00:00:55.984">
+    <property name="length">00:00:56.000</property>
+    <property name="eof">pause</property>
+    <property name="resource">3:/home/daniel/Videos/uphill.mkv</property>
+    <property name="aspect_ratio">1</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">-1</property>
+    <property name="video_index">0</property>
+    <property name="mute_on_pause">1</property>
+    <property name="warp_speed">3</property>
+    <property name="warp_resource">/home/daniel/Videos/uphill.mkv</property>
+    <property name="mlt_service">timewarp</property>
+    <property name="shotcut:producer">avformat</property>
+    <property name="video_delay">0</property>
+    <property name="shotcut:hash">7f915e018805805137b3b6cb330ebddc</property>
+    <property name="shotcut:caption">uphill.mkv (3x)</property>
+    <property name="xml">was here</property>
+    <filter id="filter0" in="00:00:26.480" out="00:00:37.120">
+      <property name="rect">277 181 4821 2606 1</property>
+      <property name="circle">0</property>
+      <property name="color">#ff000000</property>
+      <property name="radius">0</property>
+      <property name="mlt_service">qtcrop</property>
+      <property name="shotcut:filter">cropRectangle</property>
+    </filter>
+  </producer>
+  <producer id="producer1" in="00:00:00.000" out="00:01:02.640">
+    <property name="length">00:01:02.656</property>
+    <property name="eof">pause</property>
+    <property name="resource">3:/home/daniel/Videos/downhill.mkv</property>
+    <property name="aspect_ratio">1</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">-1</property>
+    <property name="video_index">0</property>
+    <property name="mute_on_pause">1</property>
+    <property name="warp_speed">3</property>
+    <property name="warp_resource">/home/daniel/Videos/downhill.mkv</property>
+    <property name="mlt_service">timewarp</property>
+    <property name="shotcut:producer">avformat</property>
+    <property name="video_delay">0</property>
+    <property name="shotcut:hash">fba036c0064fa43b235720f8e74e6059</property>
+    <property name="shotcut:caption">downhill.mkv (3x)</property>
+    <property name="xml">was here</property>
+    <filter id="filter1" in="00:00:39.056" out="00:00:43.168">
+      <property name="rect">276 181 4831 2607 1</property>
+      <property name="circle">0</property>
+      <property name="color">#ff000000</property>
+      <property name="radius">0</property>
+      <property name="mlt_service">qtcrop</property>
+      <property name="shotcut:filter">cropRectangle</property>
+    </filter>
+  </producer>
+  <producer id="producer2" in="00:00:00.000" out="00:01:02.640">
+    <property name="length">00:01:02.656</property>
+    <property name="eof">pause</property>
+    <property name="resource">3:/home/daniel/Videos/downhill.mkv</property>
+    <property name="aspect_ratio">1</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">-1</property>
+    <property name="video_index">0</property>
+    <property name="mute_on_pause">1</property>
+    <property name="warp_speed">3</property>
+    <property name="warp_resource">/home/daniel/Videos/downhill.mkv</property>
+    <property name="mlt_service">timewarp</property>
+    <property name="shotcut:producer">avformat</property>
+    <property name="video_delay">0</property>
+    <property name="shotcut:hash">fba036c0064fa43b235720f8e74e6059</property>
+    <property name="shotcut:caption">downhill.mkv (3x)</property>
+    <property name="xml">was here</property>
+    <filter id="filter2" in="00:00:44.672" out="00:00:45.584">
+      <property name="rect">276 181 4831 2607 1</property>
+      <property name="circle">0</property>
+      <property name="color">#ff000000</property>
+      <property name="radius">0</property>
+      <property name="mlt_service">qtcrop</property>
+      <property name="shotcut:filter">cropRectangle</property>
+    </filter>
+  </producer>
+  <producer id="producer3" in="00:00:00.000" out="00:01:02.640">
+    <property name="length">00:01:02.656</property>
+    <property name="eof">pause</property>
+    <property name="resource">3:/home/daniel/Videos/downhill.mkv</property>
+    <property name="aspect_ratio">1</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">-1</property>
+    <property name="video_index">0</property>
+    <property name="mute_on_pause">1</property>
+    <property name="warp_speed">3</property>
+    <property name="warp_resource">/home/daniel/Videos/downhill.mkv</property>
+    <property name="mlt_service">timewarp</property>
+    <property name="shotcut:producer">avformat</property>
+    <property name="video_delay">0</property>
+    <property name="shotcut:hash">fba036c0064fa43b235720f8e74e6059</property>
+    <property name="shotcut:caption">downhill.mkv (3x)</property>
+    <property name="xml">was here</property>
+    <filter id="filter3" in="00:00:53.360" out="00:01:00.752">
+      <property name="rect">276 181 4831 2607 1</property>
+      <property name="circle">0</property>
+      <property name="color">#ff000000</property>
+      <property name="radius">0</property>
+      <property name="mlt_service">qtcrop</property>
+      <property name="shotcut:filter">cropRectangle</property>
+    </filter>
+  </producer>
+  <playlist id="playlist0">
+    <property name="shotcut:video">1</property>
+    <property name="shotcut:name">V1</property>
+    <entry producer="producer0" in="00:00:26.480" out="00:00:37.120"/>
+    <entry producer="producer1" in="00:00:39.056" out="00:00:43.168"/>
+    <entry producer="producer2" in="00:00:44.672" out="00:00:45.584"/>
+    <entry producer="producer3" in="00:00:53.360" out="00:01:00.752"/>
+  </playlist>
+  <tractor id="tractor0" title="Shotcut version 22.01.30" in="00:00:00.000" out="00:00:23.104">
+    <property name="shotcut">1</property>
+    <property name="shotcut:projectAudioChannels">2</property>
+    <property name="shotcut:projectFolder">0</property>
+    <track producer="background"/>
+    <track producer="playlist0"/>
+    <transition id="transition0">
+      <property name="a_track">0</property>
+      <property name="b_track">1</property>
+      <property name="mlt_service">mix</property>
+      <property name="always_active">1</property>
+      <property name="sum">1</property>
+    </transition>
+    <transition id="transition1">
+      <property name="a_track">0</property>
+      <property name="b_track">1</property>
+      <property name="version">0.9</property>
+      <property name="mlt_service">frei0r.cairoblend</property>
+      <property name="threads">0</property>
+      <property name="disable">1</property>
+    </transition>
+  </tractor>
+</mlt>
