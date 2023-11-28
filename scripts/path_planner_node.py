@@ -137,7 +137,7 @@ class O3DNode(Node):
         # if self.prev_waypoint_goal is None or self.distance_to_waypoint_end() < 1.5:
         #     self.waypoint_generator(msg)
 
-        if self.prev_waypoint_goal is None or self.distance_advanced() > 0.2:
+        if self.prev_waypoint_goal is None or self.distance_advanced() > 0.25:
             self.waypoint_generator(msg)
             self.prev_position = self.current_position
 
