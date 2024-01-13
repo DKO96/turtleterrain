@@ -22,27 +22,15 @@ class AmclSubscriber(Node):
         self.new_pose = None
         self.timer = self.create_timer(0.1, self.timer_callback)
 
-
-
     def pose_callback(self, msg):
-        # self.get_logger().info('Current Pose: "%s"' % msg.pose.pose)
-        # self.get_logger().info(f'msg.pose.pose.position.x: {msg.pose.pose.position.x}')
-        # self.get_logger().info(f'msg.pose.pose.position.y: {msg.pose.pose.position.y}')
-        # self.get_logger().info(f'msg.pose.pose.position.z: {msg.pose.pose.position.z}')
-
         self.last_pose = msg
         self.new_pose = True
 
     def timer_callback(self):
         if self.last_pose is not None and not self.new_pose:
-            # self.get_logger().info('Publishing stored Pose')
             self.amcl_publisher.publish(self.last_pose)
 
         self.new_pose = False
-
-
-        
-
 
 
 def main(args=None):
