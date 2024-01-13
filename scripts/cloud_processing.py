@@ -1,4 +1,5 @@
 #!usr/bin/env python3
+import os
 import time
 import torch
 import numpy as np
@@ -6,7 +7,7 @@ import open3d as o3d
 from robot_pcd import robotPointCloud
 
 def fitPlane(downpcd):
-    plane_model, inliers = downpcd.segment_plane(distance_threshold=0.02,
+    plane_model, inliers = downpcd.segment_plane(distance_threshold=0.01,
                                                  ransac_n=3,
                                                  num_iterations=1000,
                                                  probability=0.9999)
@@ -17,22 +18,8 @@ def fitPlane(downpcd):
     inlier_cloud = downpcd.select_by_index(inliers)
     inlier_cloud, _ = inlier_cloud.remove_statistical_outliers(nb_neighbors=20, std_ratio=0.5)
     inlier_cloud, _ = inlier_cloud.remove_radius_outliers(nb_points=16 , search_radius=0.05)
-    
-    # # add points to the robot position 
-    # plane_cloud = inlier_cloud.to(o3d.core.Device('CPU:0'))
-    # np_plane_cloud = plane_cloud.point.positions.numpy()
-    # robot_pcd = robotPointCloud(plane_equation)
 
-    # plane_pcd = np.concatenate((np_plane_cloud, robot_pcd), 0)
-    
-    # plane_obj = o3d.t.geometry.PointCloud(plane_pcd)
-    # plane_tensor = o3d.t.geometry.PointCloud.from_legacy(plane_obj.to_legacy())
-    # plane_inlier_pcd = plane_tensor.to(device=o3d.core.Device("cuda:0"))
-    # plane_inlier_pcd.estimate_normals()
-
-    # o3d.visualization.draw_geometries([plane_inlier_pcd.to_legacy()])       # visualization
-
-    boundary_cloud, mask = inlier_cloud.compute_boundary_points(0.5, 60)
+    boundary_cloud, mask = inlier_cloud.compute_boundary_points(0.5, 30)
     boundary_cloud, _ = boundary_cloud.remove_statistical_outliers(nb_neighbors=5, std_ratio=1.0)
     boundary_cloud, _ = boundary_cloud.remove_radius_outliers(nb_points=5 , search_radius=0.05)
 
@@ -75,18 +62,12 @@ def ProcessCloud(pcd, robot_position, robot_orientation, target_coord):
     tensor_pcd = o3d.t.geometry.PointCloud.from_legacy(pcd_cpu.to_legacy())
     pcd_gpu = tensor_pcd.to(device=o3d.core.Device("cuda:0"))
 
-    # o3d.visualization.draw_geometries([pcd_gpu.to_legacy()])        # visualization
-
     # point cloud pre-processing    
-    downpcd = pcd_gpu.voxel_down_sample(voxel_size=0.01)
+    downpcd = pcd_gpu.voxel_down_sample(voxel_size=0.02)
     downpcd.estimate_normals(max_nn=30, radius=0.1)
 
     # fit plane
     inlier_cloud, boundary_cloud = fitPlane(downpcd)
-
-    inlier_cloud.paint_uniform_color([0.5, 0.5, 0.5])
-    # o3d.visualization.draw_geometries([boundary_cloud.to_legacy()])     # visualization
-
 
     # filter cloud
     inlier_cpu = inlier_cloud.to(o3d.core.Device('CPU:0'))
@@ -103,8 +84,6 @@ def ProcessCloud(pcd, robot_position, robot_orientation, target_coord):
     bound_filtered_pcd = o3d.geometry.PointCloud()
     bound_filtered_pcd.points = o3d.utility.Vector3dVector(bound_filtered)
     bound_filtered_pcd.paint_uniform_color([0, 0, 1])
-    # o3d.visualization.draw_geometries([bound_filtered_pcd])      # visualiztion
-    
     
     filtered_bound = torch.ones(inlier_tensor.shape[0], dtype=torch.bool, device='cuda:0')
     for boundary_pt in boundary_tensor_filtered:
@@ -114,11 +93,8 @@ def ProcessCloud(pcd, robot_position, robot_orientation, target_coord):
     np_filtered = filtered_inlier_cloud.detach().cpu().numpy()
     np_filtered_pcd = o3d.geometry.PointCloud()
     np_filtered_pcd.points = o3d.utility.Vector3dVector(np_filtered)
-    np_filtered_pcd.paint_uniform_color([0, 0, 1])
-    # o3d.visualization.draw_geometries([inlier_cloud.to_legacy(), np_filtered_pcd])      # visualiztion
-
-
-
+    np_filtered_pcd.paint_uniform_color([0, 1, 0.5])
+    
     # transfrom pcd to map frame
     transform_inlier_cloud = transform_cloud(filtered_inlier_cloud, robot_position, robot_orientation)
 
@@ -130,21 +106,24 @@ def ProcessCloud(pcd, robot_position, robot_orientation, target_coord):
     nearest_point = nearest_search(output_inlier_cloud, target_coord)
 
     # Visualizations
-    robot = o3d.geometry.PointCloud()
-    robot.points = o3d.utility.Vector3dVector([robot_position])
-    robot.paint_uniform_color([0, 0, 1])
-
     output_inlier_cloud.paint_uniform_color([1, 0, 0])
 
-    nearest_point_pcd = o3d.geometry.PointCloud()
-    nearest_point_pcd.points = o3d.utility.Vector3dVector([nearest_point])    
-    nearest_point_pcd.paint_uniform_color([0, 1, 0])
+    def create_sphere_at_point(point, radius, color):
+        sphere = o3d.geometry.TriangleMesh.create_sphere(radius=radius)
+        sphere.translate(point)
+        sphere.paint_uniform_color(color)
+        return sphere
     
-    target_pcd = o3d.geometry.PointCloud()
-    target_pcd.points = o3d.utility.Vector3dVector([target_coord])
-    target_pcd.paint_uniform_color([1, 0, 1])
+    sphere_radius = 0.05
+    robot_color = [0, 0, 1]
+    nearest_point_color = [0, 1, 0]
+    target_color = [1, 0, 1]
+    
+    robot_sphere = create_sphere_at_point(robot_position, sphere_radius, robot_color)
+    nearest_point_sphere = create_sphere_at_point(nearest_point, sphere_radius, nearest_point_color)
+    target_sphere = create_sphere_at_point(target_coord, sphere_radius, target_color)
 
-    # o3d.visualization.draw_geometries([output_inlier_cloud, robot, nearest_point_pcd, target_pcd])
+    # o3d.visualization.draw_geometries([output_inlier_cloud, robot_sphere, nearest_point_sphere, target_sphere])
 
 
 

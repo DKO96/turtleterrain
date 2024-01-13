@@ -147,32 +147,46 @@ def PathPlanner(points, start, end, target):
     waypoints = cubicSplineSmoother(path, num_points)
 
     # Visualization
-    robot = o3d.geometry.PointCloud()
-    robot.points = o3d.utility.Vector3dVector([start])
-    robot.paint_uniform_color([0, 0, 1])
+    vis = o3d.visualization.Visualizer()
+    vis.create_window()
+    vis.get_render_option().background_color = np.array([1,1,1])
 
     points_pcd = o3d.geometry.PointCloud()
     points_pcd.points = o3d.utility.Vector3dVector(points)
     points_pcd.paint_uniform_color([0.5, 0.5, 0.5])
 
-    nearest_point_pcd = o3d.geometry.PointCloud()
-    nearest_point_pcd.points = o3d.utility.Vector3dVector([end])    
-    nearest_point_pcd.paint_uniform_color([0, 1, 0])
+    def create_sphere_at_point(point, radius, color):
+        sphere = o3d.geometry.TriangleMesh.create_sphere(radius=radius)
+        sphere.translate(point)
+        sphere.paint_uniform_color(color)
+        return sphere
     
-    target_pcd = o3d.geometry.PointCloud()
-    target_pcd.points = o3d.utility.Vector3dVector([target])
-    target_pcd.paint_uniform_color([1, 0, 1])
+    sphere_radius = 0.02  # Adjust the size of the spheres
+    nearest_point_color = [0, 1, 0]
+    robot_color = [0, 0, 1]
+    path_color = [1, 0, 0]  # Red for path
+    waypoint_color = [1, 0.5, 0]  # Orange for waypoints
 
-    path_pcd = o3d.geometry.PointCloud()
-    path_pcd.points = o3d.utility.Vector3dVector(path)
-    path_pcd.paint_uniform_color([1, 0, 0])
+    robot_sphere = create_sphere_at_point(start, sphere_radius, robot_color)
+    nearest_point_sphere = create_sphere_at_point(end, sphere_radius, nearest_point_color)
+    path_spheres = [create_sphere_at_point(p, sphere_radius, path_color) for p in path]
+    waypoint_spheres = [create_sphere_at_point(p, sphere_radius, waypoint_color) for p in waypoints]
 
-    waypoints_pcd = o3d.geometry.PointCloud()
-    waypoints_pcd.points = o3d.utility.Vector3dVector(waypoints)
-    waypoints_pcd.paint_uniform_color([1, 0.5, 0])
-    
-    # o3d.visualization.draw_geometries([points_pcd, path_pcd, waypoints_pcd, robot, nearest_point_pcd, target_pcd])
+    # o3d.visualization.draw_geometries([points_pcd, *path_spheres, *waypoint_spheres, robot_sphere, nearest_point_sphere])
 
+    vis.add_geometry(points_pcd)
+    for sphere in path_spheres:
+        vis.add_geometry(sphere)
+    for sphere in waypoint_spheres:
+        vis.add_geometry(sphere)
+    vis.add_geometry(robot_sphere)
+    vis.add_geometry(nearest_point_sphere)
+
+    # Run the visualizer
+    vis.run()
+
+    # Close the visualizer window
+    vis.destroy_window()
 
 
 
