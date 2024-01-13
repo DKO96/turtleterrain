@@ -37,14 +37,6 @@ class O3DNode(Node):
         rclpy.shutdown()
 
 
-        # self.vis.remove_geometry(self.o3d_pcd)
-        # self.o3d_pcd = o3d.geometry.PointCloud(
-        #                     o3d.utility.Vector3dVector(pc_array))
-        # self.vis.add_geometry(self.o3d_pcd)
-        # self.vis.poll_events()
-        # self.vis.update_renderer()
-
-
 def main(args=None):
     rclpy.init(args=args)
     open3d_node = O3DNode()

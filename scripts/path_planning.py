@@ -172,8 +172,6 @@ def PathPlanner(points, start, end, target):
     path_spheres = [create_sphere_at_point(p, sphere_radius, path_color) for p in path]
     waypoint_spheres = [create_sphere_at_point(p, sphere_radius, waypoint_color) for p in waypoints]
 
-    # o3d.visualization.draw_geometries([points_pcd, *path_spheres, *waypoint_spheres, robot_sphere, nearest_point_sphere])
-
     vis.add_geometry(points_pcd)
     for sphere in path_spheres:
         vis.add_geometry(sphere)

@@ -131,12 +131,6 @@ class O3DNode(Node):
             print('Target location reached')
             rclpy.shutdown()
 
-        # print(f'target: {self.target_pose}')
-        # print(f'curret position: {self.current_position}')
-
-        # if self.prev_waypoint_goal is None or self.distance_to_waypoint_end() < 1.5:
-        #     self.waypoint_generator(msg)
-
         if self.prev_waypoint_goal is None or self.distance_advanced() > 0.25:
             self.waypoint_generator(msg)
             self.prev_position = self.current_position
